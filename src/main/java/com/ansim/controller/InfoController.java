@@ -1,7 +1,6 @@
 package com.ansim.controller;
 
 import com.ansim.dto.*;
-import com.ansim.mapper.InfoMapper;
 import com.ansim.service.InfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
