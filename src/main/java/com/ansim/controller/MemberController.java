@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
-@CrossOrigin(origins = {"*"})
+@CrossOrigin(origins = "*")
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
