@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>회원 기본 정보 수정</title>
+	<link rel="stylesheet" href="/css/index.css">
+
+	<script>
+		window.onload = () => {
+
+			var imgCheck = "Y";
+			var imgZone = document.querySelector('#imageZone');
+			var fileEvent = document.querySelector('#imageFile');
+			var newFileSelected = false;
+
+			//imageZone 영역 클릭 시 파일이벤트 처리, 자바스크립트에선 이벤트 발생 시 이벤트 정보를 담고 있는 event(e)라는 객체를 자동 생성.
+			imgZone.addEventListener('click',(e)=>{
+				fileEvent.click(e);	//사용자가 만든 UI를 통해 <input type="file">을 클릭한느 것과 같은 효과를 내게 됨.
+			});
+
+			fileEvent.addEventListener('change',(e)=>{
+				newFileSelected = true;
+				const files = e.target.files; //선택한 파일 정보가 e.target.files(배열)에 저장
+				showImage(files);
+			});
+
+			const showImage = (files) => {
+				//imgZone.innerHTML = '';
+				const imgFile = files[0];
+
+				if(imgFile.type.indexOf("image") < 0){
+					alert("이미지 파일만 올려 주세요");
+					return false;
+				};
+
+				const reader = new FileReader(); 	//new 연산자를 통해서 FileReader 객체를 reader가 참조(상속)
+				reader.onload = function(event) {	//reader.readAsDataURL(imgFile)로 이미지를 읽고 나서 해야 할 일
+					imgZone.innerHTML = "<img src=" + event.target.result + " id='uploadImg' style='width:350px; height:auto;'>";
+					//console.log(event.target.result);
+				};
+
+				reader.readAsDataURL(imgFile);	//실제로 이미지 파일을 읽는 부분
+				imgCheck = "Y";
+				//console.log(event.target.result);
+			}
+
+			btnRegister.addEventListener('click',async() => {
+				//유효성 검사
+				if(imgCheck == 'N'){
+					alert("프로필 이미지를 등록하세요");
+					return false;
+				}
+
+				const gender = document.querySelectorAll('input[name=gender]:checked');
+				//const gender = document.getElementsByName('gender');
+
+				let genderValue = '';
+				for(let i=0;i<gender.length; i++){
+					if(gender[i].checked === true)
+						genderValue = gender[i].value;
+				}
+
+
+				const mbti = document.querySelector('select[name=mbti] option:checked')
+
+				if(genderValue == ''){
+					alert("성별을 선택하세요");
+					return false;
+				}
+
+				if(mbti.value == 'all'){
+					alert("직업을 선택하세요");
+					return false;
+				}
+
+				if(tel_no.value == ''){
+					alert("전화번호를 입력하세요");
+					tel_no.focus();
+					return false;
+				}
+				const beforeTelno = tel_no.value;
+				//-를 삭제하기, 공백 삭제하기 trim문자열 좌우의 빈 공백을 없애주는 함수
+				const afterTelno = beforeTelno.replaceAll(/\-/ig,"").replace(/\ /ig,"").trim();
+				tel_no.value = afterTelno;
+
+
+				const formData = new FormData(RegistryForm);
+
+				await fetch('/member/memberInfoModify', {
+					method: 'POST',
+					body: formData
+				}).then((response)=> response.json())
+					.then((data)=>{
+						if(data.message === 'GOOD'){
+							alert(user_id + '님, 회원 정보가 변경되었습니다.');
+							document.location.href='/guide/map';
+						}
+					}).catch((error)=>{
+						console.log("error = "+error);
+					})
+			});
+		}
+
+	</script>
+</head>
+<body>
+<script>
+	const user_id = '[[${session.user_id}]]';
+	if(user_id == 0){
+		document.location.href="/";
+	}
+</script>
+<div class="main">
+	<h1>기본 정보 변경</h1><br>
+
+	<div class="ModifyForm">
+		<form id="RegistryForm" name="RegistryForm" method="POST" enctype="multipart/form-data">
+			<br><br>
+			<input type="file" name="fileUpload" id="imageFile" style="display:none" >
+			<span>이미지 수정을 원하시면 화면을 클릭해 주세요.</span>
+			<div class="imageZone" id="imageZone"><img style='width:350px; height:auto;' th:src="@{'/profile/' + ${memberInfo.stored_file_nm}}" /></div>
+			<div style="width:90%; text-align:left; position:relative; left:35px; border-bottom:2px solid #adadad; margin:10px; padding:10px;">
+				<input type="hidden" id="user_id" name="user_id" th:value="${session.user_id}">
+				<input type="hidden" th:value="${memberInfo.org_file_nm}" name="org_file_nm">
+				<input type="hidden" th:value="${memberInfo.stored_file_nm}" name="stored_file_nm">
+				성별 :
+				<label><input type="radio" name="gender" value="남성" th:checked="${memberInfo.gender == '남성'}">남성</label>
+				<label><input type="radio" name="gender" value="여성" th:checked="${memberInfo.gender == '여성'}">여성</label><br>
+				나이 :
+				<input type="text" id="age" name="age" th:value="${memberInfo.age}">
+				mbti :
+				<select name="mbti">
+					<option value="all" disabled selected>--아래 내용 중에서 선택--</option>
+					<option value="ISTJ" th:selected="${memberInfo.mbti == 'ISTJ'}">ISTJ</option>
+					<option value="ISTP" th:selected="${memberInfo.mbti == 'ISTP'}">ISTP</option>
+					<option value="ISFJ" th:selected="${memberInfo.mbti == 'ISFJ'}">ISFJ</option>
+					<option value="ISFP" th:selected="${memberInfo.mbti == 'ISFP'}">ISFP</option>
+					<option value="INFJ" th:selected="${memberInfo.mbti == 'INFJ'}">INFJ</option>
+					<option value="INTJ" th:selected="${memberInfo.mbti == 'INTJ'}">INTJ</option>
+					<option value="INFP" th:selected="${memberInfo.mbti == 'INFP'}">INFP</option>
+					<option value="INTP" th:selected="${memberInfo.mbti == 'INTP'}">INTP</option>
+					<option value="ESTJ" th:selected="${memberInfo.mbti == 'ESTJ'}">ESTJ</option>
+					<option value="ESFP" th:selected="${memberInfo.mbti == 'ESFP'}">ESFP</option>
+					<option value="ESFJ" th:selected="${memberInfo.mbti == 'ESFJ'}">ESFJ</option>
+					<option value="ESTP" th:selected="${memberInfo.mbti == 'ESTP'}">ESTP</option>
+					<option value="ENFP" th:selected="${memberInfo.mbti == 'ENFP'}">ENFP</option>
+					<option value="ENTP" th:selected="${memberInfo.mbti == 'ENTP'}">ENTP</option>
+					<option value="ENFJ" th:selected="${memberInfo.mbti == 'ENFJ'}">ENFJ</option>
+					<option value="ENTJ" th:selected="${memberInfo.mbti == 'ENTJ'}">ENTJ</option>
+				</select>
+				<br>
+				전화번호 :
+				<input type="text" th:value="${memberInfo.tel_no}" id="tel_no" name="tel_no">
+			</div>
+
+			<input type="button" id="btnRegister" class="btn_write" value="수정">
+			<input type="button" class="btn_cancel"  value="취소" onclick="history.back()">
+		</form>
+	</div>
+</div>
+</body>
+</html>
