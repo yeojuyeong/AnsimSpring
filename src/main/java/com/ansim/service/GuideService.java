@@ -7,6 +7,6 @@ import java.util.Map;
 
 public interface GuideService {
 
-    public List<Object> findFacInBoundary(Map<String, Object> map);
+    List<Object> findFacInBoundary(Map<String, Object> map);
 
 }
