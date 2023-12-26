@@ -31,7 +31,6 @@ public class GuideController {
         map.put("geoDistance",Math.round((distance/100000)*10000)/10000.0 );
         System.out.println("geoDistance : "+map.get("geoDistance"));
 
-        //System.out.println("dd");
         return service.findFacInBoundary(map);
 
     }
