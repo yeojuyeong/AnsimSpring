@@ -20,7 +20,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		
 		log.info("********************* 소셜 로그인 인증 완료🎈 *********************");
 		
-		setDefaultTargetUrl("/guide/map");
+		setDefaultTargetUrl("/guide/route");
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
 
