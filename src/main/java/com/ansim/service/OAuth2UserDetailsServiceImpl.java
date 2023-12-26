@@ -26,7 +26,6 @@ import java.util.Optional;
 public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService{
 
 	private final PasswordEncoder pwdEncoder;
-//	private final MemberRepository memberRepository;
 	private final MemberService service;
 	private final HttpSession session;
 	
@@ -37,8 +36,6 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService{
 		OAuth2User oAuth2User = super.loadUser(userRequest);
 		
 		String provider = userRequest.getClientRegistration().getRegistrationId();
-//		String providerId = oAuth2User.getAttribute("sub");
-//		String user_id = oAuth2User.getAttribute("email");
 		String providerId = "";
 		String user_id = "";
 
@@ -86,6 +83,7 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService{
 		String accessToken = userRequest.getAccessToken().getTokenValue();
 		session.setAttribute("accessToken", accessToken);
 		session.setAttribute("provider", provider);
+
 
 		System.out.println(accessToken);
 		return memberOAuth2DTO;		
