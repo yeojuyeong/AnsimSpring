@@ -44,7 +44,6 @@ public class InfoController {
     @PostMapping("/info/deliboxList")
     public List<DeliboxDTO> postDeliboxInBoundary(@RequestBody Map<String, Double> polygonPoint) {
         List<DeliboxDTO> deliboxDTOList = service.findDeliboxInBoundary(polygonPoint);
-
         System.out.println("deliboxDTOList.size()"+deliboxDTOList.size());
 
         return deliboxDTOList;
