@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+
+        //console.log(twoOpt(points,0.001));
+
+        //let points = [[37.48246330188131, 126.94166563924819], [37.4884,126.943], [37.4849,126.939], [37.4861,126.9441], [37.4881,126.9395], [37.486,126.9427],[37.488712578648155,126.94180433954631] ];
+
+        let points = [[37.48246330188131, 126.94166563924819],  [37.4861,126.9441],[37.4849,126.939],  [37.4881,126.9395],[37.4884,126.943], [37.486,126.9427],[37.488712578648155,126.94180433954631] ];
+
+        console.log(twoOpt(points,0.00001));
+        function calculateDistance(points) {
+            let diff = points[1] - points[0];
+            return Math.sqrt(diff * diff);
+        }
+
+        function twoOpt(points, improvementThreshold) {
+            let numPoints = points.length;
+            let improvementFactor = 1;
+            while (improvementFactor > improvementThreshold) {
+                let distanceToBeat = calculateDistance(points);
+                for (let swapFirst = 1; swapFirst < numPoints - 2; swapFirst++) {
+                    for (let swapLast = swapFirst + 2; swapLast < numPoints - 1; swapLast++) {
+                        let newPoints = [...points];
+                        newPoints.slice(swapFirst, swapLast).reverse();
+                        let newDistance = calculateDistance(newPoints);
+                        if (newDistance < distanceToBeat) {
+                            points = newPoints;
+                            improvementFactor = 1 - newDistance / distanceToBeat;
+                            break;
+                        } else {
+                            improvementFactor = 0;
+                        }
+                    }
+                }
+            }
+            return points;
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>

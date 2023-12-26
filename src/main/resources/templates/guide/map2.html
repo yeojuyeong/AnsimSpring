@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>simpleMap</title>
+    <script
+            src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=1mO8bQYuoiX935Ro97oJ7yQTNcZtkE16IBckR1k9"></script>
+    <script type="text/javascript">
+        // 페이지가 로딩이 된 후 호출하는 함수입니다.
+        function initTmap(){
+            // 출발지와 목적지의 위도와 경도
+            const startLat = 37.541286;
+            const startLon = 126.841038;
+            const endLat = 37.543331;
+            const endLon = 126.846857;
+
+            // 대각선 중점 계산
+            const midLat = (startLat + endLat) / 2.0;
+            const midLon = (startLon + endLon) / 2.0;
+
+            // map 생성
+            // Tmapv2.Map을 이용하여, 지도가 들어갈 div, 넓이, 높이를 설정합니다.
+            var map = new Tmapv2.Map("map_div", { // 지도가 생성될 div
+                center : new Tmapv2.LatLng(midLat, midLon),
+                width : "100%", // 지도의 넓이
+                height : "800px", // 지도의 높이
+                zoom : 17
+            });
+
+            //선
+            var polyline = new Tmapv2.Polyline({
+                path: [
+                    new Tmapv2.LatLng(startLat, startLon),
+                    new Tmapv2.LatLng(endLat, endLon)
+                ],
+                strokeColor: "#dd00dd",
+                strokeWeight: 6,
+                map: map
+            });
+
+            //중심좌표 Marker 객체 생성.
+            var marker = new Tmapv2.Marker({
+                position: new Tmapv2.LatLng(midLat, midLon),
+                map: map //Marker가 표시될 Map 설정..
+            });
+
+            //특정 Marker 객체 생성 1
+            var marker = new Tmapv2.Marker({
+                position: new Tmapv2.LatLng(37.540363,126.834958),
+                map: map //Marker가 표시될 Map 설정..
+            });
+
+            //특정 Marker 객체 생성 2
+            var marker = new Tmapv2.Marker({
+                position: new Tmapv2.LatLng(37.543318,126.843228),
+                map: map //Marker가 표시될 Map 설정..
+            });
+
+            //원
+            var circle = new Tmapv2.Circle({
+                center: new Tmapv2.LatLng(midLat, midLon),	// 중심좌표
+                radius: 280,	// 원의 반지름. 크기설정
+                strokeColor: "red",	// 테두리 색상
+                fillColor: "yellow",	// 원 내부 색상
+                map: map	// 지도 객체
+            });
+
+            //------------ custom 함수 정의 ------------
+            // Haversine 거리 계산
+            function haversineDistance(lat1, lon1, lat2, lon2) {
+                const toRadians = (angle) => angle * (Math.PI / 180);
+                const dLat = toRadians(lat2 - lat1);
+                const dLon = toRadians(lon2 - lon1);
+
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const radiusOfEarth = 6371000; // 지구의 반지름 (미터)
+
+                return radiusOfEarth * c;
+            }
+
+            function isPointInsideCircle(pointLat, pointLon, circleCenterLat, circleCenterLon, radius) {
+                // 원의 중심과 특정 좌표 간의 거리 계산
+                const distance = haversineDistance(pointLat, pointLon, circleCenterLat, circleCenterLon);
+                // 거리가 반지름보다 작거나 같으면 원 안에 포함되어 있다고 판단
+                return distance <= radius;
+            }
+
+            // 예시를 통한 테스트
+            const circleCenter = { lat:midLat, lon: midLon };
+            const radius = haversineDistance(startLat,startLon,endLat,endLon)/2.0; // 반지름 1,000미터로 가정
+            const testPoint1 = { lat: 37.543318, lon: 126.843228 };
+            const isInside1 = isPointInsideCircle(testPoint1.lat, testPoint1.lon, circleCenter.lat, circleCenter.lon, radius);
+
+            let text1;
+            if (isInside1) {
+                console.log("원 안에 포함되어 있습니다.");
+                text1 = '원 안에 포함';
+            } else {
+                console.log("원 밖에 있습니다.");
+                text1 = '원 밖에 있따';
+            }
+
+            //원 안에 들어오면 마커에 정보를 띄운다.
+            var content =
+                "<div style=' position: relative; border-bottom: 1px solid #dcdcdc;  padding: 0 2px 2px 0;'>"
+                + text1 +
+                "</div>";
+
+            //Popup 객체 생성.
+            infoWindow = new Tmapv2.InfoWindow({
+                position: new Tmapv2.LatLng(37.543318,126.843228), //Popup 이 표출될 맵 좌표
+                content: content, //Popup 표시될 text
+                type: 2, //Popup의 type 설정.
+                map: map //Popup이 표시될 맵 객체
+            });
+
+            map.setCenter(new Tmapv2.LatLng(37.543318,126.843228));
+
+            const testPoint2 = { lat: 37.540363, lon: 126.834958 };
+            const isInside2 = isPointInsideCircle(testPoint2.lat, testPoint2.lon, circleCenter.lat, circleCenter.lon, radius);
+
+            let text2;
+            if (isInside2) {
+                console.log("원 안에 포함되어 있습니다.");
+                text2 = '원 안에 포함';
+            } else {
+                console.log("원 밖에 있습니다.");
+                text2 = '원 밖에 있따';
+            }
+
+            //원 안에 들어오면 마커에 정보를 띄운다.
+            var content =
+                "<div style=' position: relative; border-bottom: 1px solid #dcdcdc;  padding: 0 2px 2px 0;'>"
+                + text2 +
+                "</div>";
+
+            //Popup 객체 생성.
+            infoWindow = new Tmapv2.InfoWindow({
+                position: new Tmapv2.LatLng(37.540363,126.834958), //Popup 이 표출될 맵 좌표
+                content: content, //Popup 표시될 text
+                type: 2, //Popup의 type 설정.
+                map: map //Popup이 표시될 맵 객체
+            });
+
+            map.setCenter(new Tmapv2.LatLng(37.540363,126.834958));
+
+
+            var polygon = new Tmapv2.Polygon({
+                paths: [new Tmapv2.LatLng(37.53890315347266,126.84287667274512), //bottomleft
+                    new Tmapv2.LatLng(37.545708699894256,126.84287667274512), //bottomright
+                    new Tmapv2.LatLng(37.545708699894256,126.84458255767859),//topRight
+                    new Tmapv2.LatLng(37.53890315347266,126.84458255767859),//topLFET
+                    new Tmapv2.LatLng(37.53890315347266,126.84287667274512)], //bottomleft
+                fillColor:"pink",	// 다각형 내부 색상
+                map: map	// 지도 객체
+            });
+
+
+        }
+    </script>
+</head>
+<body onload="initTmap()"><!-- 맵 생성 실행 -->
+<div id="map_div"></div>
+</body>
+</html>
