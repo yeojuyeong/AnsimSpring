@@ -19,8 +19,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 			Authentication authentication) throws IOException, ServletException {
 		
 		log.info("********************* 소셜 로그인 인증 완료🎈 *********************");
-		
-		setDefaultTargetUrl("/guide/route");
+
+//		setDefaultTargetUrl("/guide/route");
+		setDefaultTargetUrl("http://localhost:3000");
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
 
