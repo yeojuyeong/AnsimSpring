@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
@@ -197,10 +197,11 @@ public class MemberController {
 //		return result;
 //	}
 	//아이디 중복 확인
+	@ResponseBody
 	@PostMapping("/member/idCheck")
 	public String getIdCheck(@RequestParam("user_id") String user_id) throws Exception {
 		System.out.println("user_id = " + user_id);
-		return service.findIdCheck(user_id) == 0 ? "{\"status\":\"good\"}":"{\"status\":\"bad\"}";
+		return service.findIdCheck(user_id) == 0 ? "{\"status\":\"GOOD\"}":"{\"status\":\"BAD\"}";
 	}
 
 
