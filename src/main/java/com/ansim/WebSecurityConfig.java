@@ -69,6 +69,7 @@ public class WebSecurityConfig {
               .authorizeHttpRequests((authz)-> authz
                       .requestMatchers("/member/**").permitAll()
                       .requestMatchers("/guide/**").permitAll()
+                      .requestMatchers("/info/**").permitAll()
                       .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/master/**").hasAnyAuthority("MASTER")
                       .anyRequest().authenticated());
