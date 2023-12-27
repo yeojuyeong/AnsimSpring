@@ -48,7 +48,14 @@ public class JWTUtil {
 
         String result = builder.compact(); //
         log.info("JWT = {}",result);
+        log.info("Today: {}", Date.from(ZonedDateTime.now().toInstant()));
+        log.info("Expiration Date: {}", Date.from(ZonedDateTime.now().plusDays(days).toInstant()));
         return result;
+    }
+
+    public static boolean isExpired(String token, String secretKey){
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).
+                getBody().getExpiration().before(new Date());
     }
 
     //토큰 유효성 검사
@@ -75,6 +82,11 @@ public class JWTUtil {
         if(!bearerToken.isEmpty() && bearerToken.startsWith("Bearer"))
             return bearerToken.substring(7); //앞의 0-6까지의 문자는 짜르고 다음부터의 문자들을 가져 온다.
         return "INVALID_HEADER";
+    }
+
+    public static String getUserName(String token, String secretKey){
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).
+                getBody().get("username", String.class);
     }
 
     //토큰에서 email, password 추출
