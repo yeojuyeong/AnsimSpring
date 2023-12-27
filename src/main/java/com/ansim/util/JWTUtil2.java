@@ -27,7 +27,8 @@ public class JWTUtil2 {
                 getBody().get("username", String.class);
     }
 
-    public static boolean isExpired(String token, String secretKey){
+    //Jwts.parserBuilder().setSigningKey(createKey()).build().parseClaimsJws(token);
+    public static boolean isExpired(String token, String secretKey) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).
                 getBody().getExpiration().before(new Date());
     }
@@ -42,30 +43,35 @@ public class JWTUtil2 {
     }
 
     //토큰 생성
-    public static String generateToken(Map<String,Object> payloads, String secretKey, Long expiredMs) {
+    public static String generateToken(Map<String,Object> payloads, String secretKey, Long expiredSeconds) {
 
         //헤더 부분 설정
         Map<String, Object> headers = new HashMap<String, Object>();
         headers.put("typ", "JWT");
         headers.put("alg", "HS256");
 
-        String username = (String) payloads.get("username");
+        String userid = (String) payloads.get("userid");
 
-        System.out.println(" webSConfig username:"+ username);
+        System.out.println(" webSConfig username:"+ userid);
 
         Claims claims = Jwts.claims();
-        claims.put("username",username);
+        claims.put("userid",userid);
 
         JwtBuilder builder = Jwts.builder()
                 .setHeader(headers)
                 .setClaims(claims) //username 등
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant())) //오늘 날짜
-                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(expiredMs).toInstant()))
+                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(expiredSeconds).toInstant()))
                 //현재로부터 특정일 이후까지(만료일) 유효한 토큰 생성
+                //.setExpiration(new Date(new Date().getTime() + expiredMs))
                 .signWith(SignatureAlgorithm.HS256, secretKey);
 
         String result = builder.compact();
+
         log.info("JWT = {}",result);
+        log.info("setIssuedAt"+Date.from(ZonedDateTime.now().toInstant()));
+        log.info("getExpiration"+Jwts.parser().setSigningKey(secretKey).parseClaimsJws(result).getBody().getExpiration());
+
         return result;
     }
 
