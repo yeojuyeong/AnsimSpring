@@ -1,15 +1,20 @@
 package com.ansim;
 
+import com.ansim.service.JwtTestService;
 import com.ansim.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -22,6 +27,12 @@ public class WebSecurityConfig {
    private final UserDetailsServiceImpl userDetailService;
    private final OAuth2SuccessHandler oAuth2SuccessHandler;
    private final OAuth2FailureHandler oAuth2FailureHandler;
+
+   @Value("${jwt.secret}")
+   private String secretKey;
+
+   @Autowired
+   JwtTestService service;
 
    //스프링시큐리티에서 암호화 관련 객체를 가져다가 스프링빈으로 등록
    @Bean
@@ -48,14 +59,14 @@ public class WebSecurityConfig {
                       .failureHandler(authFailureHandler));
 
       //스프링 시큐리티의 자동로그인 설정
-      http
-              .rememberMe((me) -> me
-                      .key("judith")
-                      .alwaysRemember(false)
-                      .tokenValiditySeconds(3600*24*7)
-                      .rememberMeParameter("remember-me")
-                      .userDetailsService(userDetailService)
-                      .authenticationSuccessHandler(authSuccessHandler));
+//      http
+//              .rememberMe((me) -> me
+//                      .key("judith")
+//                      .alwaysRemember(false)
+//                      .tokenValiditySeconds(3600*24*7)
+//                      .rememberMeParameter("remember-me")
+//                      .userDetailsService(userDetailService)
+//                      .authenticationSuccessHandler(authSuccessHandler));
 
       //OAuth2 설정
       http
@@ -71,16 +82,24 @@ public class WebSecurityConfig {
                       .requestMatchers("/guide/**").permitAll()
                       .requestMatchers("/info/**").permitAll()
                       .requestMatchers("/chat/**").permitAll()
+                      //.requestMatchers("/jwt/**").permitAll() //추가함
+                      .requestMatchers("/jwt/**").authenticated()
                       .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/master/**").hasAnyAuthority("MASTER")
                       .anyRequest().authenticated());
 
+
+      //추가함, UsernamePasswordAuthenticationFilter 필터 전에 실행되어야 함
+      http.addFilterBefore(new JwtFilter(service,secretKey), UsernamePasswordAuthenticationFilter.class);
+
       //세션 설정
-      http
-              .sessionManagement(management -> management
-                      .maximumSessions(1)
-                      .maxSessionsPreventsLogin(false)
-                      .expiredUrl("/member/login"));
+      http.sessionManagement( management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+             // .sessionCreationPolicy(SessionCreationPolicy.STATELESS); //JWT를 사용하는 경우 써야함
+//      http
+//              .sessionManagement(management -> management
+//                      .maximumSessions(1)
+//                      .maxSessionsPreventsLogin(false)
+//                      .expiredUrl("/member/login"));
 
       //스프링 시큐리티의 로그 아웃
       http
