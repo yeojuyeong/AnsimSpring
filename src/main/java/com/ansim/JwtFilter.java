@@ -1,7 +1,7 @@
 package com.ansim;
 
 import com.ansim.service.JwtTestService;
-import com.ansim.util.JWTUtil2;
+import com.ansim.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,14 +45,14 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = authorization.split(" ")[1];
 
         //토큰 만기되었는지 여부
-//       if(JWTUtil2.isExpired(token, secretKey)){
-//           log.error("authorization error 만료:{}",authorization);
-//           filterChain.doFilter(request, response);
-//           return;
-//       }
+       if(JWTUtil.isExpired(token, secretKey)){
+           log.error("authorization error 만료:{}",authorization);
+           filterChain.doFilter(request, response);
+           return;
+       }
 
         //토큰에서 userName 꺼냄
-        String userName = JWTUtil2.getUserName(token,secretKey);
+        String userName = JWTUtil.getUserName(token,secretKey);
         log.info("Jwt Filter username:"+userName);
 
         UsernamePasswordAuthenticationToken authenticationToken =
