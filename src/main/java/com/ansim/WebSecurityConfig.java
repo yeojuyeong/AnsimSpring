@@ -70,7 +70,8 @@ public class WebSecurityConfig {
                       .requestMatchers("/member/**").permitAll()
                       .requestMatchers("/guide/**").permitAll()
                       .requestMatchers("/info/**").permitAll()
-                      .requestMatchers("/chat/**").permitAll()
+                      .requestMatchers("/mypage/**").permitAll()
+                      .requestMatchers("/ws/**").permitAll()
                       .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/master/**").hasAnyAuthority("MASTER")
                       .anyRequest().authenticated());
