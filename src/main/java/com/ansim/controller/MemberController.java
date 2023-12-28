@@ -50,43 +50,32 @@ public class MemberController {
 	@PostMapping("/member/loginCheck")
 	public String postLogin(MemberDTO memberData) throws Exception {
 
-		System.out.println("1111111111");
 		String accessToken = "";
 		String refreshToken = "";
-		System.out.println("22222222222");
 
 		//JWT 로그인
 		Map<String,Object> data = new HashMap<>();
 		data.put("user_id", memberData.getUser_id());
 		data.put("password", memberData.getPassword());
 
-		System.out.println("3333333333");
-
 		//access token & refresh token 생성
 		accessToken = jwtUtil.generateToken(data, 1);
 		refreshToken = jwtUtil.generateToken(data, 5);
-
-		System.out.println("4444444444");
 
 		//아이디 존재 여부 확인
 		if (service.findIdCheck(memberData.getUser_id()) == 0) {
 			return "{\"message\":\"ID_NOT_FOUND\"}";
 		}
-		System.out.println("5555555555");
 
 //		MemberDTO member = mservice.memberInfo(loginData.getEmail());
 		//아이디가 존재하면 읽어온 email로 로그인 정보 가져 오기
 		MemberDTO member = service.findMember(memberData.getUser_id());
-
-		System.out.println("6666666666");
 
 		//패스워드가 올바르게 들어 왔는지 확인
 		if (!pwdEncoder.matches(memberData.getPassword(), service.findMember(memberData.getUser_id()).getPassword())) {
 			//잘못된 패스워드 일때
 			return "{\"message\":\"PASSWORD_NOT_FOUND\"}";
 		}
-		System.out.println("777777777");
-
 
 		System.out.println("getUser_id: "+member.getUser_id());
 		System.out.println("getPassword: "+member.getPassword());
@@ -95,13 +84,9 @@ public class MemberController {
 		System.out.println("accessToken: "+accessToken);
 		System.out.println("refreshToken: "+refreshToken);
 
-		System.out.println("88888888888");
-
 		//최종적으로 클라이언트에 전달할 JSON 값 생성
 		return  "{\"message\":\"JWT\",\"accessToken\":\"" + accessToken + "\",\"refreshToken\":\"" + refreshToken +
 				"\",\"user_nm\":\"" + URLEncoder.encode(member.getUser_nm(),"UTF-8") + "\",\"role\":\"" + member.getRole() + "\"}";
-//		return "{\"message\":\"GOOD\"}";
-
 	}
 
 	//토큰 유효성 검사
@@ -109,7 +94,7 @@ public class MemberController {
 	public String getValidate(HttpServletRequest request) {
 		String token = jwtUtil.getTokenFromAuthorization(request);
 		if(token.equals("JWT_NOT_FOUND"))
-			return "{\"message\":\"bad\"}";
+			return "{\"message\":\"BAD\"}";
 		String jwtCheck = jwtUtil.validateToken(token);
 
 		switch(jwtCheck) {
@@ -127,7 +112,7 @@ public class MemberController {
 	public String postRefreshToken(MemberDTO memberDTO, @RequestParam("refreshToken") String refreshToken ) {
 
 		Map<String,Object> data = new HashMap<>();
-		data.put("email", memberDTO.getUser_id());
+		data.put("user_id", memberDTO.getUser_id());
 		data.put("password", memberDTO.getPassword());
 
 		//access token & refresh token 생성

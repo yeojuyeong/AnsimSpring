@@ -22,7 +22,6 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
 	@SneakyThrows
 	@Override
-//	public UserDetails loadUserByUsername(String user_nm) throws UsernameNotFoundException {
 	public UserDetails loadUserByUsername(String user_id) throws UsernameNotFoundException {
 		
 		//username은 스프링 시큐리티가 필터로 작동하면서 로그인 요청에서 가로채온 userid임.

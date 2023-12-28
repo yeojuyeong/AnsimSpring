@@ -26,9 +26,7 @@ import java.util.Optional;
 public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService{
 
 	private final PasswordEncoder pwdEncoder;
-//	private final MemberRepository memberRepository;
 	private final MemberService service;
-	private final HttpSession session;
 	
 	@SneakyThrows
 	@Override
@@ -37,8 +35,6 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService{
 		OAuth2User oAuth2User = super.loadUser(userRequest);
 		
 		String provider = userRequest.getClientRegistration().getRegistrationId();
-//		String providerId = oAuth2User.getAttribute("sub");
-//		String user_id = oAuth2User.getAttribute("email");
 		String providerId = "";
 		String user_id = "";
 
@@ -53,41 +49,26 @@ public class OAuth2UserDetailsServiceImpl extends DefaultOAuth2UserService{
 		} else if (provider.equals("kakao")) { //카카오 로그인인 경우
 			Map<String, Object> attributes = oAuth2User.getAttributes();
 			Map<String, Object> response = (Map<String, Object>) attributes.get("kakao_account");
-			System.out.println(response);
 			providerId = response.get("profile").toString();
 			user_id = response.get("email").toString();
 		}
-		
-		log.info("provider = {}", provider);
-		log.info("providerId = {}", providerId);
-		log.info("user_id = {}", user_id);
-		
-		oAuth2User.getAttributes().forEach((k,v)-> { 
-			log.info(k + ":" + v);
-		});
 
+		//해당 id값으로 회원DB에 값이 없으면 시스템 운영에 필요한 최소값만 insert
 		MemberDTO member = saveSocialMember(user_id, provider);
 		
-		//Role 값 읽어 들임...
+		//Role 값 읽어 들임
 		List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
 		SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getRole());
 		grantedAuthorities.add(grantedAuthority);
 		
 		MemberOAuth2DTO memberOAuth2DTO = new MemberOAuth2DTO();
-		//attributes, authorities, name을 MemberOAuth2DTO에 넣어 줌. 
 		memberOAuth2DTO.setAttribute(oAuth2User.getAttributes());
 		memberOAuth2DTO.setAuthorities(grantedAuthorities);
-		memberOAuth2DTO.setName(member.getUser_nm());
-		
-		session.setAttribute("user_id", member.getUser_id());
-		session.setAttribute("user_nm", member.getUser_nm());
-		session.setAttribute("role", member.getRole());
-		session.setAttribute("fromSocial","Y");
-		String accessToken = userRequest.getAccessToken().getTokenValue();
-		session.setAttribute("accessToken", accessToken);
-		session.setAttribute("provider", provider);
+		//memberOAuth2DTO.setName(member.getUser_nm());
+		memberOAuth2DTO.setName(member.getUser_id());
+		memberOAuth2DTO.setAccessToken(userRequest.getAccessToken().getTokenValue());
 
-		System.out.println(accessToken);
+		//System.out.println(accessToken);
 		return memberOAuth2DTO;		
 		
 	}
