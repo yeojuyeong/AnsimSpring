@@ -190,10 +190,17 @@ public class MemberController {
 
 
 	// 회원 정보 보기
+//	@GetMapping("/member/memberInfo")
+//	public void getMemberInfo(HttpSession session, Model model) throws Exception{
+//		String user_id = (String)session.getAttribute("user_id");
+//		model.addAttribute("memberInfo", service.findMember(user_id));
+//	}
+	//사용자 정보 보기
+	@ResponseBody
 	@GetMapping("/member/memberInfo")
-	public void getMemberInfo(HttpSession session, Model model) throws Exception{
-		String user_id = (String)session.getAttribute("user_id");
-		model.addAttribute("memberInfo", service.findMember(user_id));
+	public MemberDTO getMemberInfo(String user_id) throws Exception {
+
+		return service.findMember(user_id);
 	}
 
 	//회원 기본 정보 변경
