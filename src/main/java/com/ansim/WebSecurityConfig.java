@@ -80,6 +80,7 @@ public class WebSecurityConfig {
                       .requestMatchers("/chat/**").permitAll()
                       //.requestMatchers("/jwt/**").permitAll() //추가함
                       .requestMatchers("/jwt/**").authenticated()
+                      .requestMatchers("/ws/**").permitAll()
                       .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/master/**").hasAnyAuthority("MASTER")
                       .anyRequest().authenticated());
