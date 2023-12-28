@@ -7,7 +7,9 @@ import jakarta.xml.bind.DatatypeConverter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -24,10 +26,9 @@ public class JWTUtil {
 
     //키 설정
     private Key createKey() {
-//        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(baseKey);
-//        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-//        return signingKey;
-        Key signingKey = Keys.secretKeyFor(signatureAlgorithm);
+        String baseKey="hello1ansim2kkk3eee4yyy5i6want7go8home9let10me11go12"; //API 테스트 시엔 열어줘야함
+        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(baseKey);
+        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
         return signingKey;
     }
 
@@ -46,23 +47,21 @@ public class JWTUtil {
                 .setExpiration(Date.from(ZonedDateTime.now().plusDays(days).toInstant()))
                 .signWith(createKey(), signatureAlgorithm);
 
-        String result = builder.compact(); //
+        String result = builder.compact();
         log.info("JWT = {}",result);
-        log.info("Today: {}", Date.from(ZonedDateTime.now().toInstant()));
-        log.info("Expiration Date: {}", Date.from(ZonedDateTime.now().plusDays(days).toInstant()));
+        log.info("JWT Expiration Date: {}",Jwts.parser().setSigningKey(createKey()).parseClaimsJws(result).getBody().getExpiration());
         return result;
-    }
-
-    public static boolean isExpired(String token, String secretKey){
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).
-                getBody().getExpiration().before(new Date());
     }
 
     //토큰 유효성 검사
     public String validateToken(String token) {
 
         try {
-            Jwts.parserBuilder().setSigningKey(createKey()).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(createKey())
+                    .build()
+                    .parseClaimsJws(token);
+            //Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration().before(new Date());
             return "VALID_JWT";
         }catch(io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             return "INVALID_JWT";
@@ -79,18 +78,15 @@ public class JWTUtil {
     //http Authorization 헤더에서 토큰 가져 오기
     public String getTokenFromAuthorization(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if(!bearerToken.isEmpty() && bearerToken.startsWith("Bearer"))
+        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer"))
             return bearerToken.substring(7); //앞의 0-6까지의 문자는 짜르고 다음부터의 문자들을 가져 온다.
         return "INVALID_HEADER";
     }
 
-    public static String getUserName(String token, String secretKey){
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).
-                getBody().get("username", String.class);
-    }
-
     //토큰에서 email, password 추출
     public Map<String,Object> getDataFromToken(String token) throws Exception{
+
+        String baseKey="hello1ansim2kkk3eee4yyy5i6want7go8home9let10me11go12"; //API 테스트 시엔 열어줘야함
 
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(baseKey))
@@ -99,8 +95,8 @@ public class JWTUtil {
                 .getBody();
 
         Map<String, Object> data = new HashMap<>();
-        data.put("user_id", claims.get("user_id").toString());
-        data.put("password", claims.get("password").toString());
+        data.put("userId", claims.get("userId").toString());
+        //data.put("password", claims.get("password").toString());
 
         return data;
     }

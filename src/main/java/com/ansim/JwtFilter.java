@@ -1,6 +1,5 @@
 package com.ansim;
 
-import com.ansim.service.JwtTestService;
 import com.ansim.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,39 +22,39 @@ import java.util.List;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
-    //@Autowired
-    private final JwtTestService service;
-    private final String secretKey;
+    JWTUtil jwtUtil = new JWTUtil();
 
     @Override //허용되는 문
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-        log.info("authorization:{}",authorization);
+        String token = jwtUtil.getTokenFromAuthorization(request);
+        log.info("Token taken from header:{}",token);
 
-        //토큰 안 보내면 block
-        if(authorization == null || !authorization.startsWith("Bearer ")){
-            log.error("authorization error null or not startwith Bearer :{}",authorization);
+        if("INVALID_HEADER".equals(token)){
+            log.error("authorization error null or not startwith Bearer :{}",request.getHeader(HttpHeaders.AUTHORIZATION));
             filterChain.doFilter(request, response);
             return;
         }
 
-        //토큰 꺼내기
-        String token = authorization.split(" ")[1];
+        //토큰이 유효한지 check
+        if(!"VALID_JWT".equals(jwtUtil.validateToken(token))){
+            log.error("token is invaild!!");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        //토큰 만기되었는지 여부
-       if(JWTUtil.isExpired(token, secretKey)){
-           log.error("authorization error 만료:{}",authorization);
-           filterChain.doFilter(request, response);
-           return;
-       }
+        String userid="";
 
-        //토큰에서 userName 꺼냄
-        String userName = JWTUtil.getUserName(token,secretKey);
-        log.info("Jwt Filter username:"+userName);
+        try {
+            userid = (String) jwtUtil.getDataFromToken(token).get("userId");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        log.info("Userid taken from 토큰에서:{}",userid);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userName, null, List.of(new SimpleGrantedAuthority("USER")));
+                new UsernamePasswordAuthenticationToken(userid, null, List.of(new SimpleGrantedAuthority("USER")));
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken); //권한부여
