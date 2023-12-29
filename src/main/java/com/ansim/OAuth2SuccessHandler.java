@@ -51,15 +51,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		Cookie JWTCookie = new Cookie("jwt", jwkToken);
 		JWTCookie.setMaxAge(60*60*24);  // 쿠키 유효기간 설정 (초단위)
 		JWTCookie.setPath("/");  // 쿠키 사용 경로 설정
-		//JWTCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
-		//JWTCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
+//		JWTCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
+//		JWTCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
 
 		// 쿠키 생성
 		Cookie userIDCookie = new Cookie("userid", userDto.getUser_id());
 		userIDCookie.setMaxAge(60*60*24);  // 쿠키 유효기간 설정 (분을 초로 변환), one day 설정
 		userIDCookie.setPath("/");  // 쿠키 사용 경로 설정
-		//userIDCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
-		//userIDCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
+//		userIDCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
+//		userIDCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
 
 		// 쿠키 추가
 		response.addCookie(JWTCookie);

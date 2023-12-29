@@ -27,7 +27,7 @@ public class MessageController {
 //        else {
 //            messageService.sendMessage(MessageDTO.MessageType.TALK, message.getRoomId(), message.getDetailMessage(), message.getSenderId());
 //        }
-        log.info("roomID = {}", message.getRoomId());
+        log.info("boardID = {}", message.getRoomId());
 
         // 게시판 작성자에게 메시지를 보냅니다.
         Long writerId = messageService.getWriterId(message.getRoomId()); // 작성자 ID를 가져오는 예시 함수
