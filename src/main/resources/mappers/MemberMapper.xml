@@ -9,9 +9,9 @@
 <!-- 회원가입 memberInfoRegistry -->
 <insert id="insertMember" parameterType="com.ansim.dto.MemberDTO">
 	insert into MEM_INFO_TBL
-	    (user_id, user_nm, password, age, gender, mbti, tel_no, regdate, last_pw_date, pw_chk, role, org_file_nm, stored_file_nm, file_size, ansim_cnt)
+	    (user_id, user_nm, password, age, gender, mbti, tel_no, regdate, last_pw_date, pw_chk, role, org_file_nm, stored_file_nm, file_size, ansim_cnt, fromSocial)
 	values
-	    (#{user_id},#{user_nm},#{password},#{age},#{gender},#{mbti},#{tel_no},now(), #{last_pw_date},1 ,'USER', #{org_file_nm},#{stored_file_nm},#{file_size},#{ansim_cnt})
+	    (#{user_id},#{user_nm},#{password},#{age},#{gender},#{mbti},#{tel_no},now(), #{last_pw_date},1 ,'USER', #{org_file_nm},#{stored_file_nm},#{file_size},#{ansim_cnt},#{fromSocial})
    </insert>
 
 <!-- 아이디 중복 확인 idCheck -->
