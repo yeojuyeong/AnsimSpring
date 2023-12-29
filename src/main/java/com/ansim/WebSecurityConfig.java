@@ -1,10 +1,8 @@
 package com.ansim;
 
-import com.ansim.service.JwtTestService;
 import com.ansim.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,9 +28,6 @@ public class WebSecurityConfig {
 
    @Value("${jwt.secret}")
    private String secretKey;
-
-   @Autowired
-   JwtTestService service;
 
    //스프링시큐리티에서 암호화 관련 객체를 가져다가 스프링빈으로 등록
    @Bean
@@ -79,18 +74,19 @@ public class WebSecurityConfig {
       http
               .authorizeHttpRequests((authz)-> authz
                       .requestMatchers("/member/**").permitAll()
-                      .requestMatchers("/guide/**").permitAll()
+                      //.requestMatchers("/guide/**").permitAll()
+                      .requestMatchers("/guide/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/info/**").permitAll()
                       .requestMatchers("/chat/**").permitAll()
                       //.requestMatchers("/jwt/**").permitAll() //추가함
                       .requestMatchers("/jwt/**").authenticated()
+                      .requestMatchers("/ws/**").permitAll()
                       .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/master/**").hasAnyAuthority("MASTER")
                       .anyRequest().authenticated());
 
-
       //추가함, UsernamePasswordAuthenticationFilter 필터 전에 실행되어야 함
-      http.addFilterBefore(new JwtFilter(service,secretKey), UsernamePasswordAuthenticationFilter.class);
+      http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
       //세션 설정
       http.sessionManagement( management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

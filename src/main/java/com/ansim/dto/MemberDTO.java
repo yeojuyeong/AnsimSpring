@@ -33,13 +33,9 @@ public class MemberDTO {
     private long file_size;
     private String authkey;
     private int ansim_cnt;
-
     private String fromSocial;
 
-
     public MemberDTO toDto(OAuth2User oAuth2User) {
-
-        var attributes = oAuth2User.getAttributes();
 
         Collection<? extends GrantedAuthority> authorities = oAuth2User.getAuthorities();
 
@@ -50,12 +46,11 @@ public class MemberDTO {
         }
 
         return MemberDTO.builder()
-                .user_id(oAuth2User.getAttribute("email")) //구글은 email값이 있다.
+                .user_id(oAuth2User.getName()) //private String name; 에 user_id를 셋팅함
                 //.role((String)attributes.get("name"))
                 .role(authorityStrings.get(0))
                 .build();
     }
-
     @Override
     public String toString() {
         return "MemberDTO{" +

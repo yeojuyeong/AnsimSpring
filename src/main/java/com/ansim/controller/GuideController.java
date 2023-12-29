@@ -39,6 +39,15 @@ public class GuideController {
 
     }
 
+    @PostMapping ("/guide/jwttest")
+    @ResponseBody
+    public String getRoute1(Model model, HttpSession session) {
+        //model.addAttribute("accessToken", session.getAttribute("accessToken"));
+        System.out.println("jwttest입성");
+        return "jwttest입성";
+    }
+
+
 }
 
 

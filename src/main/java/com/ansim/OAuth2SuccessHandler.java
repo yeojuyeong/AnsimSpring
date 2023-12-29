@@ -6,7 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -33,68 +32,39 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
 		
-		log.info("********************* 소셜 로그인 인증 완료🎈 *********************");
-//		 쿠키 생성
-		HttpSession session = request.getSession();
-		String socialToken = (String) session.getAttribute("accessToken");
+		log.info("********************* 소셜 로그인 인증 완료 *********************");
 
-		String user_id = (String) session.getAttribute("user_id");
-		String role = (String) session.getAttribute("role");
+		OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 
-
-//		OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
-//
-//		MemberDTO userDto = new MemberDTO().toDto(oAuth2User);
-//		System.out.println("userDto tostring : "+userDto.toString());
-//
-//		Map<String,Object> payloads = new HashMap<>();
-//		payloads.put("id",userDto.getUser_id());
-//		payloads.put("role",userDto.getRole());
+		MemberDTO userDto = new MemberDTO().toDto(oAuth2User);
 
 		// JWT 토큰 생성
 		Map<String, Object> jwtPayloads = new HashMap<>();
-		jwtPayloads.put("user_id", user_id);
-		jwtPayloads.put("role", role);
-// 로그로 출력
-		log.info("user_id = {}", user_id);
-		log.info("role = {}", role);
+		jwtPayloads.put("userId", userDto.getUser_id());
+		//jwtPayloads.put("role", userDto.getRole());
 
-//		String jwtToken = jwtUtil.generateToken(jwtPayloads, 30);  // 30 days expiration, adjust as needed
+		//클라이언트의 로그인 요청이 들어오면 서버는 검증(ID / PW과 유효하다면) 후 클라이언트 고유 ID 등의 정보를 Payload에 담는다
 		// Access Token
-		String accessToken = jwtUtil.generateToken(jwtPayloads, 1);
-		// Refresh Token
-		String refreshToken = jwtUtil.generateToken(jwtPayloads, 5);
+		String jwkToken = jwtUtil.generateToken(jwtPayloads, 1);
 
-		// 설정할 유효 기간 (예: 30분)
-		int expirationMinutes = 30;
-
-		// Access Token 쿠키 생성
-		Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-		accessTokenCookie.setMaxAge(expirationMinutes * 60);  // 쿠키 유효기간 설정 (분을 초로 변환)
-		accessTokenCookie.setPath("/");  // 쿠키 사용 경로 설정
-		accessTokenCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
-		accessTokenCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
-
-		// Refresh Token 쿠키 생성
-		Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-		refreshTokenCookie.setMaxAge(expirationMinutes * 60 * 24 * 5);  // 쿠키 유효기간 설정 (5일)
-		refreshTokenCookie.setPath("/");  // 쿠키 사용 경로 설정
-		refreshTokenCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
-		refreshTokenCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
+		// jwkToken 쿠키 생성
+		Cookie JWTCookie = new Cookie("jwt", jwkToken);
+		JWTCookie.setMaxAge(60*60*24);  // 쿠키 유효기간 설정 (초단위)
+		JWTCookie.setPath("/");  // 쿠키 사용 경로 설정
+		JWTCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
+		JWTCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
 
 		// 쿠키 생성
-		Cookie socialTokenCookie = new Cookie("socialToken", socialToken);
-		socialTokenCookie.setMaxAge(expirationMinutes * 60);  // 쿠키 유효기간 설정 (분을 초로 변환)
-		socialTokenCookie.setPath("/");  // 쿠키 사용 경로 설정
-		socialTokenCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
-		socialTokenCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
+		Cookie userIDCookie = new Cookie("userid", userDto.getUser_id());
+		userIDCookie.setMaxAge(60*60*24);  // 쿠키 유효기간 설정 (분을 초로 변환), one day 설정
+		userIDCookie.setPath("/");  // 쿠키 사용 경로 설정
+		userIDCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
+		userIDCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
 
 		// 쿠키 추가
-		response.addCookie(socialTokenCookie);
-		response.addCookie(accessTokenCookie);
-		response.addCookie(refreshTokenCookie);
+		response.addCookie(JWTCookie);
+		response.addCookie(userIDCookie);
 
-//		setDefaultTargetUrl("/guide/route");
 		setDefaultTargetUrl("http://localhost:3000");
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
