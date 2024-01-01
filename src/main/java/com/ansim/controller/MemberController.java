@@ -60,7 +60,7 @@ public class MemberController {
 
 		//access token & refresh token 생성
 		accessToken = jwtUtil.generateToken(data, 1);
-		refreshToken = jwtUtil.generateToken(data, 5);
+//		refreshToken = jwtUtil.generateToken(data, 5);
 
 		//아이디 존재 여부 확인
 		if (service.findIdCheck(memberData.getUser_id()) == 0) {
@@ -120,56 +120,92 @@ public class MemberController {
 	}
 
 	// 회원 등록 화면 보기
+	@ResponseBody
 	@GetMapping("/member/signup")
 		public void getSignup(Model model) {
 
 		List<String> genderOptions = service.findGender(2);
 		model.addAttribute("gender", genderOptions);
-
 	}
 
-	// 회원 등록 하기
+//	// 회원 등록 하기
+//	@ResponseBody
+//	@PostMapping("/member/signup")
+//	public Map<String, String> postSignup(MemberDTO member,Model model,@RequestParam("fileUpload") MultipartFile multipartFile) throws Exception{
+//
+//		String path="c:\\Repository\\profile\\";
+//		File targetFile;
+//
+//		if(!multipartFile.isEmpty()) {
+//			String org_file_nm = multipartFile.getOriginalFilename();
+//			// hello.png
+//			String org_fileExtension = org_file_nm.substring(org_file_nm.lastIndexOf("."));
+//			// askdjfklasjdkfljaskldfasdf + .png
+//			String stored_file_nm = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
+//
+//			try {
+//				targetFile = new File(path + stored_file_nm);
+//
+//				multipartFile.transferTo(targetFile);
+//
+//				member.setOrg_file_nm(org_file_nm);
+//				member.setStored_file_nm(stored_file_nm);
+//				member.setFile_size(multipartFile.getSize());
+//
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//
+//			String inputPassword = member.getPassword();
+//			String pwd = pwdEncoder.encode(inputPassword); // 단방향 암호화
+//			member.setPassword(pwd);
+//			member.setLast_pw_date(LocalDate.now());
+//		}
+//		service.addMember(member);
+//
+//
+//		Map<String, String> data = new HashMap<>();
+//		data.put("message", "GOOD");
+//		//data.put("username", member.getUsername());
+//		data.put("user_nm", URLEncoder.encode(member.getUser_nm(),"UTF-8"));
+//
+//		return data;
+//
+//	}
+
+	//회원 등록
 	@ResponseBody
 	@PostMapping("/member/signup")
-	public Map<String, String> postSignup(MemberDTO member,Model model,@RequestParam("fileUpload") MultipartFile multipartFile) throws Exception{
+	public String postSignup(MemberDTO member, @RequestParam("imgProfile") MultipartFile mpr) throws Exception {
 
-		String path="c:\\Repository\\profile\\";
-		File targetFile;
+		System.out.println("111111111111");
+		String path = "c:\\Repository\\profile\\";
+		String org_file_nm = "";
+		long filesize = 0L;
 
-		if(!multipartFile.isEmpty()) {
-			String org_file_nm = multipartFile.getOriginalFilename();
-			// hello.png
+		if(!mpr.isEmpty()) {
+			File targetFile = null;
+
+			org_file_nm = mpr.getOriginalFilename();
 			String org_fileExtension = org_file_nm.substring(org_file_nm.lastIndexOf("."));
-			// askdjfklasjdkfljaskldfasdf + .png
 			String stored_file_nm = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
-
-			try {
-				targetFile = new File(path + stored_file_nm);
-
-				multipartFile.transferTo(targetFile);
-
-				member.setOrg_file_nm(org_file_nm);
-				member.setStored_file_nm(stored_file_nm);
-				member.setFile_size(multipartFile.getSize());
-
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-
-			String inputPassword = member.getPassword();
-			String pwd = pwdEncoder.encode(inputPassword); // 단방향 암호화
-			member.setPassword(pwd);
-			member.setLast_pw_date(LocalDate.now());
+			filesize = mpr.getSize();
+			targetFile = new File(path + stored_file_nm);
+			mpr.transferTo(targetFile);	//raw data를 targetFile에서 가진 정보대로 변환
+			member.setOrg_file_nm(org_file_nm);
+			member.setStored_file_nm(stored_file_nm);
+			member.setFile_size(filesize);
 		}
+		System.out.println("222222222");
+
+		member.setPassword(pwdEncoder.encode(member.getPassword()));
+		System.out.println("33333333");
+
 		service.addMember(member);
+		System.out.println("444444444");
 
+		return "{\"message\":\"GOOD\",\"user_nm\":\"" + URLEncoder.encode(member.getUser_nm(), "UTF-8") + "\"}";
 
-		Map<String, String> data = new HashMap<>();
-		data.put("message", "GOOD");
-		//data.put("username", member.getUsername());
-		data.put("user_nm", URLEncoder.encode(member.getUser_nm(),"UTF-8"));
-
-		return data;
 
 	}
 
@@ -182,10 +218,11 @@ public class MemberController {
 //		return result;
 //	}
 	//아이디 중복 확인
+	@ResponseBody
 	@PostMapping("/member/idCheck")
 	public String getIdCheck(@RequestParam("user_id") String user_id) throws Exception {
 		System.out.println("user_id = " + user_id);
-		return service.findIdCheck(user_id) == 0 ? "{\"status\":\"good\"}":"{\"status\":\"bad\"}";
+		return service.findIdCheck(user_id) == 0 ? "{\"status\":\"GOOD\"}":"{\"status\":\"BAD\"}";
 	}
 
 
@@ -212,52 +249,48 @@ public class MemberController {
 
 	//회원 기본 정보 변경
 	@ResponseBody
-	@PostMapping("/member/memberInfoModify")
-	public Map<String, String> postMemberInfoModify(HttpSession session, MemberDTO member, @RequestParam("fileUpload") MultipartFile multipartFile) throws Exception {
+	@PostMapping("/member/mypageModify")
+	public Map<String, String> postMemberInfoModify(MemberDTO member, @RequestParam(value = "imgProfile", required = false)  MultipartFile mpr) throws Exception {
 
-		String userid = (String)session.getAttribute("user_id");
+		System.out.println("111111111111");
+		System.out.println("Received member data: " + member);
+		System.out.println("mpr: " + mpr);
 
 
-		String path="c:\\Repository\\profile\\";
-		File targetFile;
+		String path = "c:\\Repository\\profile\\";
+		String org_file_nm = "";
+		String stored_file_nm = "";
+		long file_size = 0L;
 
-		MemberDTO members = service.findMember(userid);
-		members.setGender(member.getGender());
-		members.setMbti(member.getMbti());
-		members.setAge(member.getAge());
-		members.setGender(member.getGender());
-		members.setTel_no(member.getTel_no());
-		members.setOrg_file_nm(member.getOrg_file_nm());
-		members.setStored_file_nm(member.getStored_file_nm());
-		members.setFile_size(member.getFile_size());
+		if(mpr != null) {
+			File targetFile = null;
 
-		if(!multipartFile.isEmpty()) {
-			String org_filename = multipartFile.getOriginalFilename();
-			// hello.png
-			String org_fileExtension = org_filename.substring(org_filename.lastIndexOf("."));
-			// askdjfklasjdkfljaskldfasdf + .png
-			String stroed_filename = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
-
-			try {
-				targetFile = new File(path + stroed_filename);
-
-				multipartFile.transferTo(targetFile);
-
-				member.setOrg_file_nm(org_filename);
-				member.setStored_file_nm(stroed_filename);
-				member.setFile_size(multipartFile.getSize());
-
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-
+			org_file_nm = mpr.getOriginalFilename();
+			String org_fileExtension = org_file_nm.substring(org_file_nm.lastIndexOf("."));
+			stored_file_nm = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
+			file_size = mpr.getSize();
+			targetFile = new File(path + stored_file_nm);
+			mpr.transferTo(targetFile);	//raw data를 targetFile에서 가진 정보대로 변환
+			member.setOrg_file_nm(org_file_nm);
+			member.setStored_file_nm(stored_file_nm);
+			member.setFile_size(file_size);
+		}else {
+			//사진변경이 없으면 기존 데이터 가져오기
+			org_file_nm = member.getOrg_file_nm();
+			stored_file_nm = member.getStored_file_nm();
+			file_size = member.getFile_size();
 		}
+		System.out.println("222222222");
+
+		System.out.println("Received member data2: " + member);
 
 		service.modifyMember(member);
 
+		System.out.println("Received member data3: " + member);
 
 		Map<String, String> data = new HashMap<>();
 		data.put("message", "GOOD");
+		data.put("user_nm", URLEncoder.encode(member.getUser_nm(),"UTF-8"));
 		return data;
 	}
 

@@ -27,6 +27,14 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override //허용되는 문
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        String requestURI = request.getRequestURI();
+
+        // 회원가입 API에 대한 요청은 토큰 검사를 하지 않도록 설정
+        if (requestURI.equals("/member/signup")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = jwtUtil.getTokenFromAuthorization(request);
         log.info("Token taken from header:{}",token);
 

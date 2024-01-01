@@ -7,7 +7,7 @@
 
     <!-- cctv coordinate -->
     <select id="selectCctvInBoundary" parameterType="map" resultType="com.ansim.dto.CctvDTO">
-        SELECT id, addr, district, latitude, longitude
+        SELECT id, addr, district, latitude, longitude, type
         FROM INFO_CCTV_COORD_TBL
         WHERE longitude BETWEEN #{bottomLeftLng} AND #{topRightLng}
           AND latitude BETWEEN #{bottomLeftLat} AND #{topRightLat}
@@ -15,7 +15,7 @@
 
     <!-- emergbell coordinate -->
     <select id="selectEmergbellInBoundary" parameterType="map" resultType="com.ansim.dto.EmergbellDTO">
-        SELECT id, road_addr, addr, police_conn_yn, mng_org, latitude, longitude
+        SELECT id, road_addr, addr, police_conn_yn, mng_org, latitude, longitude, type
         FROM INFO_EMERGBELL_COORD_TBL
         WHERE longitude BETWEEN #{bottomLeftLng} AND #{topRightLng}
           AND latitude BETWEEN #{bottomLeftLat} AND #{topRightLat}
@@ -23,7 +23,7 @@
 
     <!-- delibox coordinate -->
     <select id="selectDeliboxInBoundary" parameterType="map" resultType="com.ansim.dto.DeliboxDTO">
-        SELECT id, addr, addr_nm, latitude, longitude
+        SELECT id, addr, addr_nm, latitude, longitude, type
         FROM INFO_DELIBOX_COORD_TBL
         WHERE longitude BETWEEN #{bottomLeftLng} AND #{topRightLng}
           AND latitude BETWEEN #{bottomLeftLat} AND #{topRightLat}
@@ -31,7 +31,7 @@
 
     <!-- police coordinate -->
     <select id="selectPoliceInBoundary" parameterType="map" resultType="com.ansim.dto.PoliceDTO">
-        SELECT id, addr, police_station_nm, police_office_nm, division, telno, latitude, longitude
+        SELECT id, addr, police_station_nm, police_office_nm, division, telno, latitude, longitude, type
         FROM INFO_POLICE_COORD_TBL
         WHERE longitude BETWEEN #{bottomLeftLng} AND #{topRightLng}
           AND latitude BETWEEN #{bottomLeftLat} AND #{topRightLat}
@@ -39,7 +39,7 @@
 
     <!-- store coordinate -->
     <select id="selectStoreInBoundary" parameterType="map" resultType="com.ansim.dto.StoreDTO">
-        SELECT id, addr, store_brand, store_nm, latitude, longitude
+        SELECT id, addr, store_brand, store_nm, latitude, longitude, type
         FROM INFO_STORE_COORD_TBL
         WHERE longitude BETWEEN #{bottomLeftLng} AND #{topRightLng}
           AND latitude BETWEEN #{bottomLeftLat} AND #{topRightLat}
