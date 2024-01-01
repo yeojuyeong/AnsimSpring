@@ -34,7 +34,7 @@
 <update id="updateMember" parameterType="com.ansim.dto.MemberDTO">
 	update MEM_INFO_TBL set
 	    org_file_nm=#{org_file_nm}, stored_file_nm=#{stored_file_nm}, file_size=#{file_size},
-		gender=#{gender},age=#{age}, mbti=#{mbti}, tel_no=#{tel_no}
+	    user_nm=#{user_nm},gender=#{gender}, mbti=#{mbti}, tel_no=#{tel_no}
 		where user_id=#{user_id}
 </update>
 
