@@ -1,7 +1,7 @@
-package com.ansim.model;
-
-public enum Status {
-    JOIN,
-    MESSAGE,
-    LEAVE
-}
+//package com.ansim.model;
+//
+//public enum Status {
+//    JOIN,
+//    MESSAGE,
+//    LEAVE
+//}
