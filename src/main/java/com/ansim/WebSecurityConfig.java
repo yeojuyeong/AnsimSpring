@@ -81,9 +81,12 @@ public class WebSecurityConfig {
                       //.requestMatchers("/jwt/**").permitAll() //추가함
                       .requestMatchers("/jwt/**").authenticated()
                       .requestMatchers("/ws/**").permitAll()
-                      .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
+//                      .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
+                      .requestMatchers("/board/**").permitAll()
                       .requestMatchers("/master/**").hasAnyAuthority("MASTER")
-                      .anyRequest().authenticated());
+//                      .anyRequest().authenticated());
+                      .anyRequest().permitAll());
+
 
       //추가함, UsernamePasswordAuthenticationFilter 필터 전에 실행되어야 함
       http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
