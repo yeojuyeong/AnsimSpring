@@ -24,7 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //    private final StompHandler stompHandler; // jwt 토큰 인증 핸들러
 
     // 유저에 대한 세션키(socket id)를 저장할 용도의 map
-    private static final Map<String, String> sessionKeys = new HashMap<>();
+    public static final Map<String, String> sessionKeys = new HashMap<>();
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
@@ -57,9 +57,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     String sessionId = headerAccessor.getSessionId();
                     sessionKeys.values().remove(sessionId);
                 }
-
                 return message;
-
             }
         });
     }

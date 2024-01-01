@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.ansim.WebSocketConfig.sessionKeys;
+
 @Controller
 @RequiredArgsConstructor
 public class SocketController {
@@ -31,24 +33,27 @@ public class SocketController {
 
 // /app/message
     @MessageMapping("/message")
-    public void pubSendMessage(Map<String, String> params) {
+    public void pubSendMessage(Map<String, String> params, SimpMessageHeaderAccessor headerAccessor) {
         String receiverName = params.get("receiverName");
         String message = params.get("message");
         String senderName = params.get("senderName");
+
+        // STOMP 헤더에 세션 키를 추가
+        headerAccessor.setHeader("sessionKey", sessionKeys.get(receiverName));
 
         // 전송자와 메시지 내용을 데이터로 보낸다.
         Map<String, String> data = new HashMap<>();
         data.put("message", message);
         data.put("sender", senderName);
 
-        System.out.println("receiverName, message, senderName : " + receiverName + message + senderName);
+        System.out.println("receiverName, message, senderName, headerAccessor.getMessageHeaders() : " + receiverName + message + senderName + headerAccessor.getMessageHeaders());
 
         //채널에 구독하고 있는 사용자들 중 모두에게가 아닌 특정한 사용자에게 메세지를 보낼 수 있도록 해주는 메소드
         //convertAndSendToUser(String user, String destination, Object payload)
 
         // convertAndSendToUser로 특정 유저의 큐에 데이터를 넣어준다.
         this.messagingTemplate.convertAndSendToUser(
-                receiverName, "/queue/message",  data
+                receiverName, "/queue/message",  data , headerAccessor.getMessageHeaders()
         );
     }
 
