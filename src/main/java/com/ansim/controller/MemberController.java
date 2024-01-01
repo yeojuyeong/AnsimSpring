@@ -250,7 +250,7 @@ public class MemberController {
 	//회원 기본 정보 변경
 	@ResponseBody
 	@PostMapping("/member/mypageModify")
-	public Map<String, String> postMemberInfoModify(MemberDTO member, @RequestParam("imgProfile") MultipartFile mpr) throws Exception {
+	public Map<String, String> postMemberInfoModify(MemberDTO member, @RequestParam(value = "imgProfile", required = false)  MultipartFile mpr) throws Exception {
 
 		System.out.println("111111111111");
 		System.out.println("Received member data: " + member);
@@ -259,20 +259,26 @@ public class MemberController {
 
 		String path = "c:\\Repository\\profile\\";
 		String org_file_nm = "";
-		long filesize = 0L;
+		String stored_file_nm = "";
+		long file_size = 0L;
 
-		if(!mpr.isEmpty()) {
+		if(mpr != null) {
 			File targetFile = null;
 
 			org_file_nm = mpr.getOriginalFilename();
 			String org_fileExtension = org_file_nm.substring(org_file_nm.lastIndexOf("."));
-			String stored_file_nm = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
-			filesize = mpr.getSize();
+			stored_file_nm = UUID.randomUUID().toString().replaceAll("-", "") + org_fileExtension;
+			file_size = mpr.getSize();
 			targetFile = new File(path + stored_file_nm);
 			mpr.transferTo(targetFile);	//raw data를 targetFile에서 가진 정보대로 변환
 			member.setOrg_file_nm(org_file_nm);
 			member.setStored_file_nm(stored_file_nm);
-			member.setFile_size(filesize);
+			member.setFile_size(file_size);
+		}else {
+			//사진변경이 없으면 기존 데이터 가져오기
+			org_file_nm = member.getOrg_file_nm();
+			stored_file_nm = member.getStored_file_nm();
+			file_size = member.getFile_size();
 		}
 		System.out.println("222222222");
 
