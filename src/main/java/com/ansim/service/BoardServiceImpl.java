@@ -77,6 +77,11 @@ public class BoardServiceImpl implements BoardService{
         return mapper.selectView(seqno);
     }
 
+    //동행 신청 리스트
+    public List<Map<String, Object>> findApplicantList(int seqno) throws Exception {
+        return mapper.selectApplicantList(seqno);
+    }
+
     // 게시물 내용 이전보기
     @Override
     public int findPre_seqno(int seqno, String keyword) throws Exception {
@@ -92,6 +97,16 @@ public class BoardServiceImpl implements BoardService{
         data.put("seqno", seqno);
         data.put("keyword", keyword);
         return mapper.selectNext_seqno(data);
+    }
+
+    // 동행 신청
+    @Override
+    public void addApplication(int post_no, String applicant, String writer) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("post_no", post_no);
+        data.put("applicant", applicant);
+        data.put("writer", writer);
+        mapper.insertApplication(data);
     }
 
     //게시물 수정

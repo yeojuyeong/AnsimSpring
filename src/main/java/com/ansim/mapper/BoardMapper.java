@@ -29,11 +29,17 @@ public interface BoardMapper {
     //게시물 상세 내용 보기
     public Map<String, Object> selectView(int seqno)throws Exception;
 
+    //동행 신청 리스트
+    public List<Map<String, Object>> selectApplicantList(int seqno)throws Exception;
+
     //게시물 내용 이전 보기
     public int selectPre_seqno(Map<String, Object> data)throws Exception;
 
     //게시물 내용 다음 보기
     public int selectNext_seqno(Map<String, Object> data)throws Exception;
+
+    // 동행 신청
+    public void insertApplication(Map<String, Object> data);
 
     //게시물 수정
     public void updateBoard(BoardDTO board)throws Exception;

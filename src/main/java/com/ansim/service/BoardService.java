@@ -32,11 +32,17 @@ public interface BoardService {
     //게시물 상세 내용 보기
     public Map<String, Object> findView(int seqno)throws Exception;
 
+    //동행 신청 리스트
+    public List<Map<String, Object>> findApplicantList(int seqno)throws Exception;
+
     //게시물 내용 이전 보기
     public int findPre_seqno(int seqno, String keyword)throws Exception;
 
     //게시물 내용 다음 보기
     public int findNext_seqno(int seqno, String keyword)throws Exception;
+
+    // 동행 신청
+    public void addApplication(int post_no, String applicant, String writer);
 
     //게시물 수정
     public void modifyBoard(BoardDTO board)throws Exception;

@@ -5,6 +5,7 @@ import com.ansim.service.BoardService;
 import com.ansim.util.Page;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -96,8 +97,9 @@ public class BoardController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("cookie_stored_file_nm", service.findFile(user_id));
-        response.put("role", role);
+        response.put("role", role); // role값 가져오는 것도 짜야 됨.
         response.put("view", service.findView(seqno));
+        response.put("applicant_list", service.findApplicantList(seqno));
         response.put("page", pageNum);
         response.put("keyword", keyword);
         response.put("pre_seqno", service.findPre_seqno(seqno, keyword));
@@ -109,6 +111,20 @@ public class BoardController {
         }
 
         return response;
+    }
+
+    // 동행 신청
+    @PostMapping("/restapi/view")
+    public String postViewAddDetails(@RequestParam("post_no") int post_no,
+                                     @RequestParam("applicant") String applicant,
+                                     @RequestParam("writer") String writer) {
+
+        try {
+            service.addApplication(post_no, applicant, writer);
+            return "{\"message\":\"GOOD\"}";
+        } catch (DataIntegrityViolationException ex) {
+            return "{\"message\":\"EXISTED\"}";
+        }
     }
 
     // 게시물 삭제하기
