@@ -9,11 +9,11 @@
     <select id="selectList" parameterType="HashMap" resultType="Map">
         SELECT seq,seqno, user_id, title, DATE_FORMAT(regdate,'%Y-%m-%d %H:%i:%s') as regdate,
                content, departure_latitude, departure_longitude,departure,destination,
-               destination_latitude, destination_longitude, meeting_time, hitno, stopover, ansim_cnt
+               destination_latitude, destination_longitude, meeting_time, hitno, mem_cnt, stopover, ansim_cnt
         FROM (
                  select @rownum:=@rownum+1 as seq, seqno, B.user_id, title, B.regdate,
             content, departure_latitude, departure_longitude,departure,destination,
-            destination_latitude, destination_longitude, meeting_time, hitno, stopover, M.ansim_cnt
+            destination_latitude, destination_longitude, meeting_time, hitno, mem_cnt, stopover, M.ansim_cnt
                  from BRD_BOARD_TBL B
                      JOIN MEM_INFO_TBL M ON B.user_id = M.user_id, (SELECT @rownum:=0) r
                  WHERE B.user_id LIKE CONCAT('%', #{keyword}, '%') OR
