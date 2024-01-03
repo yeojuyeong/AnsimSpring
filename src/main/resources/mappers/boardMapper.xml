@@ -114,7 +114,7 @@
             M.stored_file_nm, M.user_nm, M.age, M.gender, M.mbti, M.ansim_cnt, M.user_id
         FROM BRD_ACM_TBL B
                  INNER JOIN MEM_INFO_TBL M ON B.applicant = M.user_id
-        WHERE B.post_no = #{seqno}
+        WHERE B.post_no = #{seqno} and (B.accepted = 'Y' OR B.accepted IS NULL)
     </select>
 
     <!-- 게시물 내용 이전 보기 -->

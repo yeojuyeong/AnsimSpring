@@ -98,6 +98,8 @@ public class BoardController {
         response.put("pre_seqno", service.findPre_seqno(seqno, keyword));
         response.put("next_seqno", service.findNext_seqno(seqno, keyword));
 
+        System.out.println(service.findApplicantList(seqno));
+
         // 조회수 증가 (String 비교할때는 equals 사용)
         if (!user_id.equals(service.findView(seqno).get("user_id"))) {
             service.modifyHitno(seqno);
