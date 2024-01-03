@@ -8,6 +8,9 @@ import java.util.Map;
 
 public interface BoardService {
 
+    // role 구하기
+    public String findRole(String user_id) throws Exception;
+
     // 안심 동행 게시물 목록 보기
     public List<Map<String, Object>> findList(int startPoint, int endPoint, String keyword) throws Exception;
 
@@ -32,11 +35,32 @@ public interface BoardService {
     //게시물 상세 내용 보기
     public Map<String, Object> findView(int seqno)throws Exception;
 
+    //동행 신청 리스트
+    public List<Map<String, Object>> findApplicantList(int seqno)throws Exception;
+
     //게시물 내용 이전 보기
     public int findPre_seqno(int seqno, String keyword)throws Exception;
 
     //게시물 내용 다음 보기
     public int findNext_seqno(int seqno, String keyword)throws Exception;
+
+    // 동행 신청
+    public void addApplication(int post_no, String applicant, String writer);
+
+    // 수락 여부 확인
+    public String findAccepted(int post_no, String applicant, String writer) throws Exception;
+
+    // 동행 신청 수락
+    public void modifyAccept(int post_no, String applicant, String writer) throws Exception;
+
+    // 동행 신청 수락 : 신청자 동행 포인트 + 1
+    public void modifyAnsim_cnt_A(String applicant) throws Exception;
+
+    // 동행 신청 수락 : 작성자 동행 포인트 + 1
+    public void modifyAnsim_cnt_W(String writer) throws Exception;
+
+    // 동행 신청 거부
+    public void modifyDeny(int post_no, String applicant, String writer) throws Exception;
 
     //게시물 수정
     public void modifyBoard(BoardDTO board)throws Exception;

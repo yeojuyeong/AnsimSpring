@@ -3,8 +3,10 @@ package com.ansim.controller;
 import com.ansim.dto.BoardDTO;
 import com.ansim.service.BoardService;
 import com.ansim.util.Page;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -28,7 +30,8 @@ public class BoardController {
     // 안심 동행 게시물 페이지
     @GetMapping("/restapi/list")
     public Map<String, Object> getList(@RequestParam("page") int pageNum,
-                        @RequestParam(name = "keyword", defaultValue = "", required = false) String keyword) throws Exception {
+                        @RequestParam(name = "keyword", defaultValue = "", required = false) String keyword,
+                                       @RequestParam("user_id") String user_id) throws Exception {
 
 //        System.out.println("yourMethod started");
 
@@ -41,6 +44,7 @@ public class BoardController {
         Page page = new Page();
 
         Map<String, Object> response = new HashMap<>();
+        response.put("role", service.findRole(user_id));
         response.put("list", service.findList(startPoint, endPoint, keyword));
         response.put("page", pageNum);
         response.put("keyword", keyword);
@@ -56,18 +60,11 @@ public class BoardController {
     @GetMapping("/restapi/write")
     public Map<String, String> getWriteDetails(@RequestParam("user_id") String user_id) throws Exception {
 
-//        // userid 세션 값 가져오기
-//        String user_id = (String)session.getAttribute("user_id");
-
-        // 리액트는 세션 못쓰니까 JWT로 받아왔다 치고 임시로 넣음.
-//        String cookie_user_id = "jongh2107@gmail.com";
-        // 클라이언트에 있는 user_id 쿠키를 리액트에서 받기 때문에 굳이 컨트롤러에서 넣어줄 필요 없음.
-
         Map<String, String> response = new HashMap<>();
-//        response.put("user_id", user_id);
+        response.put("role", service.findRole(user_id));
         response.put("stored_file_nm", service.findFile(user_id));
 
-        return response; //DB에서 stored_file_nm 값 가져옴.
+        return response;
 
 //        // 출발지, 목적지 가져오기 추후에 추가 예정
 //        model.addAttribute("points", service.findWrite(user_id));
@@ -89,15 +86,13 @@ public class BoardController {
                                               @RequestParam("user_id") String user_id
                                 ) throws Exception {
 
-        // 리액트는 세션 못쓰니까 JWT로 받아왔다 치고 임시로 넣음.
-//        String cookie_user_id = "jongh2107@gmail.com";
         // 클라이언트에 있는 user_id 쿠키를 리액트에서 받기 때문에 굳이 컨트롤러에서 넣어줄 필요 없음.
-        String role = "MASTER";
 
         Map<String, Object> response = new HashMap<>();
         response.put("cookie_stored_file_nm", service.findFile(user_id));
-        response.put("role", role);
+        response.put("role", service.findRole(user_id));
         response.put("view", service.findView(seqno));
+        response.put("applicant_list", service.findApplicantList(seqno));
         response.put("page", pageNum);
         response.put("keyword", keyword);
         response.put("pre_seqno", service.findPre_seqno(seqno, keyword));
@@ -109,6 +104,50 @@ public class BoardController {
         }
 
         return response;
+    }
+
+    // 동행 신청
+    @PostMapping("/restapi/view")
+    public String postViewAddDetails(@RequestParam("post_no") int post_no,
+                                     @RequestParam("applicant") String applicant,
+                                     @RequestParam("writer") String writer) {
+
+        try {
+            service.addApplication(post_no, applicant, writer);
+            return "{\"message\":\"GOOD\"}";
+        } catch (DataIntegrityViolationException ex) {
+            return "{\"message\":\"EXISTED\"}";
+        }
+    }
+
+    // 동행 신청 수락
+    @PostMapping("/restapi/accept")
+    public String postAcceptModify(@RequestParam("post_no") int post_no,
+                                   @RequestParam("applicant") String applicant,
+                                     @RequestParam("writer") String writer) throws Exception {
+
+        if ("Y".equals(service.findAccepted(post_no, applicant, writer))) {
+            return "{\"message\":\"CLICKED\"}";
+        } else {
+            service.modifyAccept(post_no, applicant, writer);
+            service.modifyAnsim_cnt_A(applicant);
+            service.modifyAnsim_cnt_W(writer);
+            return "{\"message\":\"GOOD\"}";
+        }
+    }
+
+    // 동행 신청 거절
+    @PostMapping("/restapi/deny")
+    public String postDenyModify(@RequestParam("post_no") int post_no,
+                                 @RequestParam("applicant") String applicant,
+                                 @RequestParam("writer") String writer) throws Exception {
+
+        if ("N".equals(service.findAccepted(post_no, applicant, writer))) {
+            return "{\"message\":\"CLICKED\"}";
+        } else {
+            service.modifyDeny(post_no, applicant, writer);
+            return "{\"message\":\"GOOD\"}";
+        }
     }
 
     // 게시물 삭제하기
@@ -129,15 +168,10 @@ public class BoardController {
                                          @RequestParam("user_id") String user_id
                           ) throws Exception {
 
-//        // 리액트는 세션 못쓰니까 JWT로 받아왔다 치고 임시로 넣음.
-//        String cookie_user_id = "jongh2107@gmail.com";
-        // 클라이언트에 있는 user_id 쿠키를 리액트에서 받기 때문에 굳이 컨트롤러에서 넣어줄 필요 없음.
-        String role = "MASTER";
 
         Map<String, Object> response = new HashMap<>();
-//        response.put("cookie_user_id", user_id);
         response.put("cookie_stored_file_nm", service.findFile(user_id));
-        response.put("role", role);
+        response.put("role", service.findRole(user_id));
         response.put("view", service.findView(seqno));
         response.put("page", pageNum);
         response.put("keyword", keyword);

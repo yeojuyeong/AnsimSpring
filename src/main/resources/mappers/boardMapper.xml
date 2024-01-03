@@ -5,15 +5,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ansim.mapper.BoardMapper">
 
+    <!-- role 구하기 -->
+    <select id="selectRole" parameterType="string" resultType="string">
+        SELECT role FROM MEM_INFO_TBL
+        WHERE user_id = #{user_id}
+    </select>
+
     <!-- 안심 동행 게시물 목록 보기 -->
     <select id="selectList" parameterType="HashMap" resultType="Map">
         SELECT seq,seqno, user_id, title, DATE_FORMAT(regdate,'%Y-%m-%d %H:%i:%s') as regdate,
                content, departure_latitude, departure_longitude,departure,destination,
-               destination_latitude, destination_longitude, meeting_time, hitno, stopover, ansim_cnt
+               destination_latitude, destination_longitude, meeting_time, hitno, mem_cnt, stopover, ansim_cnt
         FROM (
                  select @rownum:=@rownum+1 as seq, seqno, B.user_id, title, B.regdate,
             content, departure_latitude, departure_longitude,departure,destination,
-            destination_latitude, destination_longitude, meeting_time, hitno, stopover, M.ansim_cnt
+            destination_latitude, destination_longitude, meeting_time, hitno, mem_cnt, stopover, M.ansim_cnt
                  from BRD_BOARD_TBL B
                      JOIN MEM_INFO_TBL M ON B.user_id = M.user_id, (SELECT @rownum:=0) r
                  WHERE B.user_id LIKE CONCAT('%', #{keyword}, '%') OR
@@ -102,6 +108,15 @@
     WHERE B.seqno=#{seqno}
     </select>
 
+    <!-- 동행 신청 리스트 -->
+    <select id="selectApplicantList" parameterType="int" resultType="Map">
+        SELECT
+            M.stored_file_nm, M.user_nm, M.age, M.gender, M.mbti, M.ansim_cnt, M.user_id
+        FROM BRD_ACM_TBL B
+                 INNER JOIN MEM_INFO_TBL M ON B.applicant = M.user_id
+        WHERE B.post_no = #{seqno}
+    </select>
+
     <!-- 게시물 내용 이전 보기 -->
     <select id="selectPre_seqno" parameterType="HashMap" resultType="int">
         <![CDATA[
@@ -121,6 +136,46 @@
           AND (user_id LIKE CONCAT('%', #{keyword}, '%') OR title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'));
         ]]>
 	</select>
+
+    <!-- 동행 신청 -->
+    <insert id="insertApplication" parameterType="HashMap">
+        insert into BRD_ACM_TBL (post_no,writer,applicant) values
+            (#{post_no},#{writer},#{applicant})
+    </insert>
+
+    <!-- 수락 여부 확인 -->
+    <select id = "selectAccepted" parameterType="HashMap" resultType="String">
+        SELECT accepted FROM BRD_ACM_TBL
+        WHERE applicant = #{applicant} AND writer = #{writer} AND post_no = #{post_no};
+    </select>
+
+    <!-- 동행 신청 수락 -->
+    <update id="updateAccept" parameterType="HashMap">
+            UPDATE BRD_ACM_TBL
+            SET accepted = 'Y'
+            WHERE applicant = #{applicant} AND writer = #{writer} AND post_no = #{post_no};
+    </update>
+
+    <!-- 동행 신청 수락 : 신청자 동행 포인트 + 1 -->
+    <update id="updateAnsim_cnt_A" parameterType="string">
+        UPDATE MEM_INFO_TBL
+        SET ansim_cnt = ansim_cnt + 1
+        WHERE user_id = #{applicant};
+    </update>
+
+    <!-- 동행 신청 수락 : 작성자 동행 포인트 + 1 -->
+    <update id="updateAnsim_cnt_W" parameterType="string">
+        UPDATE MEM_INFO_TBL
+        SET ansim_cnt = ansim_cnt + 1
+        WHERE user_id = #{writer};
+    </update>
+
+    <!-- 동행 신청 거절 -->
+    <update id="updateDeny" parameterType="HashMap">
+        UPDATE BRD_ACM_TBL
+        SET accepted = 'N'
+        WHERE applicant = #{applicant} AND writer = #{writer} AND post_no = #{post_no};
+    </update>
 
     <!-- 게시물 수정 하기 -->
     <update id="updateBoard" parameterType="com.ansim.dto.BoardDTO">
