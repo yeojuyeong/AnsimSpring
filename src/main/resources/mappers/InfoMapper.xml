@@ -45,4 +45,16 @@
           AND latitude BETWEEN #{bottomLeftLat} AND #{topRightLat}
     </select>
 
+    <!-- 안심 시설 고장 옵션 가져오기 -->
+    <select id="selectBrokenTypeByType" parameterType="String" resultType="map">
+        SELECT *
+        FROM COM_OPT_TBL
+        WHERE group_cd = #{topRightLng}
+    </select>
+
+    <insert id="insertBrokenReport" parameterType="com.ansim.dto.BrokenReportDTO" >
+        INSERT INTO INFO_BROKEN_REPORT_TBL (fac_id, fac_type, broken_opt_cd, content, user_id )
+            VALUE (#{fac_id},#{fac_type},#{broken_opt_cd},#{content},#{user_id});
+    </insert>
+
 </mapper>

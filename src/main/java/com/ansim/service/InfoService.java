@@ -22,4 +22,8 @@ public interface InfoService {
     //store 목록 보기
     List<StoreDTO> findStoreInBoundary(Map<String, Double> map);
 
+    List<Map> findBrokenTypeByType(String type);
+
+    void addBrokenReport(BrokenReportDTO dto);
+
 }

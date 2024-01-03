@@ -43,4 +43,32 @@ public class InfoServiceImpl implements InfoService {
     public List<StoreDTO> findStoreInBoundary(Map<String, Double> map) {
         return mapper.selectStoreInBoundary(map);
     }
+
+    @Override
+    public List<Map> findBrokenTypeByType(String type) {
+        String group_cd = "3";
+        switch (type) {
+            case "C":
+                group_cd = "3";
+                break;
+            case "E":
+                group_cd = "4";
+                break;
+            case "D":
+                group_cd = "5";
+                break;
+            case "P":
+                group_cd = "6";
+                break;
+            case "S":
+                group_cd = "7";
+                break;
+        }
+        return mapper.selectBrokenTypeByType(group_cd);
+    }
+
+    @Override
+    public void addBrokenReport(BrokenReportDTO dto) {
+        mapper.insertBrokenReport(dto);
+    }
 }

@@ -13,6 +13,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 public class InfoController {
+
     private final InfoService service;
 
     //지도페이지 보기
@@ -69,16 +70,18 @@ public class InfoController {
         return storeDTOList;
     }
 
-    // 채팅
-    @GetMapping("/test")
-    public Map<String, Object> testHandler() {
-        System.out.println("TEST RestAPI / Test 핸들러 실행");
+    //시설타입에 따른 고장옵션 목록가져오기
+    @GetMapping("/info/brokenType")
+    public List<Map> getBrokenType( @RequestParam(name = "type") String type ) {
+        System.out.println("getBrokenType 실행: "+type);
+        return service.findBrokenTypeByType(type);
+    }
 
-        Map<String, Object> res = new HashMap<>();
-        res.put("SUCCESS", true);
-        res.put("SUCCESS_TEXT", "Hello SpringBoot/React");
-
-        return res;
+    @PostMapping("/info/brokenReportAdd")
+    public String brokenReportAdd(@RequestBody BrokenReportDTO dto) {
+        System.out.println("BrokenReportDTO"+dto.toString());
+        service.addBrokenReport(dto);
+        return "{\"message\":\"Success\"}";
     }
 
 }

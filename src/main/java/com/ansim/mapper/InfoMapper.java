@@ -23,4 +23,9 @@ public interface InfoMapper {
 
     //store 목록 보기
     List<StoreDTO> selectStoreInBoundary(Map<String, Double> map);
+
+    //store 목록 보기
+    List<Map> selectBrokenTypeByType(String group_cd);
+
+    void insertBrokenReport(BrokenReportDTO dto);
 }
