@@ -74,9 +74,14 @@
     <!-- 게시물 등록 하기 -->
     <insert id="insertWrite" parameterType="com.ansim.dto.BoardDTO">
     insert into BRD_BOARD_TBL (user_id,gender,mem_cnt,sound,title,content,
-                               departure,destination, meeting_time, regdate) values
+                               departure,destination, meeting_time, regdate,
+                               departure_latitude, departure_longitude,
+                               destination_latitude, destination_longitude) values
         (#{user_id},#{gender},#{mem_cnt},#{sound},#{title},#{content},
-         #{departure},#{destination},#{meeting_time}, now())
+         #{departure},#{destination},#{meeting_time}, now()
+            ,#{departure_latitude},#{departure_longitude}
+        ,#{destination_latitude},#{destination_longitude}
+        )
     </insert>
 
 
@@ -99,6 +104,10 @@
     SELECT
         B.seqno, B.user_id, B.title, B.content, B.departure, B.destination,
         B.mem_cnt, B.meeting_time,
+        B.departure_latitude,
+        B.departure_longitude,
+        B.destination_latitude,
+        B.destination_longitude,
         M.stored_file_nm, M.user_nm, M.age, M.gender AS mem_gender, M.mbti, M.ansim_cnt,
         O.opt_nm AS gender, O1.opt_nm AS sound
     FROM BRD_BOARD_TBL B
