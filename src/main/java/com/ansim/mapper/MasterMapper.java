@@ -17,8 +17,17 @@ public interface MasterMapper {
     // delibox 고장신고 수
     public int selectDeliCount() throws Exception;
 
+    // police 고장신고 수
+    public int selectPoliceCount() throws Exception;
+
+    // store 고장신고 수
+    public int selectStoreCount() throws Exception;
+
     // 최근 7일간 고장신고 등록수
-    public List<Map<String, Object>> reportRegdateCnt() throws Exception;
+    public List<Map<String, Object>> selectTotalCntInthelast7days() throws Exception;
+
+    // 최근 7일간 고장신고 등록수
+    public List<Map<String, Object>> selectCntBytypeBrokenoptcd() throws Exception;
 
 
 }

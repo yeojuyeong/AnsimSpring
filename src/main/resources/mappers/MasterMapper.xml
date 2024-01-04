@@ -5,29 +5,50 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ansim.mapper.MasterMapper">
 
-    <!-- cctv 고장신고 수 -->
+    <!-- 최근 7일간 cctv 고장신고 수 -->
     <select id = "selectCCTVCount" parameterType="string" resultType="int">
-        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'C'
+        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'C' AND regdate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     </select>
 
-    <!-- emergbell 고장신고 수 -->
+    <!-- 최근 7일간 emergbell 고장신고 수 -->
     <select id = "selectEmergCount" parameterType="string" resultType="int">
-        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'E'
+        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'E' AND regdate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     </select>
 
-    <!-- delibox 고장신고 수 -->
+    <!-- 최근 7일간 delibox 고장신고 수 -->
     <select id = "selectDeliCount" parameterType="string" resultType="int">
-        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'D'
+        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'D' AND regdate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    </select>
+
+    <!-- 최근 7일간 polic 고장신고 수 -->
+    <select id = "selectPoliceCount" parameterType="string" resultType="int">
+        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'P' AND regdate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+    </select>
+
+    <!-- 최근 7일간  store 고장신고 수 -->
+    <select id = "selectStoreCount" parameterType="string" resultType="int">
+        select count(*) from INFO_BROKEN_REPORT_TBL where fac_type = 'S' AND regdate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
     </select>
 
     <!-- 최근 7일간 고장신고 등록수 -->
-    <select id="reportRegdateCnt" resultType="map">
+    <select id="selectTotalCntInthelast7days" resultType="map">
         SELECT DATE_FORMAT(regdate, '%Y-%m-%d') AS regdate, COUNT(*) AS count
         FROM INFO_BROKEN_REPORT_TBL
         WHERE regdate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
         GROUP BY DATE_FORMAT(regdate, '%Y-%m-%d')
         ORDER BY regdate DESC
     </select>
+
+    <!-- 최근 7일간 type별 broken_cd 별 -->
+    <select id="selectCntBytypeBrokenoptcd" resultType="map">
+        SELECT fac_type, b.opt_cd, b.opt_nm, COUNT(*) AS count
+        FROM INFO_BROKEN_REPORT_TBL a,
+            COM_OPT_TBL b
+        WHERE a.broken_opt_cd = b.opt_cd
+          AND a.regdate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY fac_type, broken_opt_cd
+    </select>
+
 
 
 </mapper>

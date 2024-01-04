@@ -89,7 +89,7 @@ public class WebSecurityConfig {
 
 
       //추가함, UsernamePasswordAuthenticationFilter 필터 전에 실행되어야 함
-      http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
+      //http.addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
       //세션 설정
       http.sessionManagement( management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -28,7 +28,12 @@ public class MasterController {
         response.put("cctv_report", service.findCCTVCount());
         response.put("emergbell_report", service.findEmergCount());
         response.put("delibox_report", service.findDeliCount());
-        response.put("7days_report", service.reportRegdateCnt());
+        response.put("police_report", service.findPoliceCount());
+        response.put("store_report", service.findStoreCount());
+        response.put("7days_report", service.findTotalCntInthelast7days());
+        response.put("cntBytypeBrokenoptcd", service.findCntBytypeBrokenoptcd());
+
+        //System.out.println("findCntBytypeBrokenoptcd"+service.findCntBytypeBrokenoptcd());
 
         return response;
 

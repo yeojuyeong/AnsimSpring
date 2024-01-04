@@ -31,10 +31,25 @@ public class MasterServiceImpl implements MasterService {
         return mapper.selectDeliCount();
     }
 
+    @Override
+    public int findPoliceCount() throws Exception {
+        return mapper.selectPoliceCount();
+    }
+
+    @Override
+    public int findStoreCount() throws Exception {
+        return mapper.selectStoreCount();
+    }
+
     // 최근 7일간 고장신고 등록수
     @Override
-    public List<Map<String, Object>> reportRegdateCnt() throws Exception {
-        return mapper.reportRegdateCnt();
+    public List<Map<String, Object>> findTotalCntInthelast7days() throws Exception {
+        return mapper.selectTotalCntInthelast7days();
+    }
+
+    @Override
+    public List<Map<String, Object>> findCntBytypeBrokenoptcd() throws Exception {
+        return mapper.selectCntBytypeBrokenoptcd();
     }
 
 }
