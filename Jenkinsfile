@@ -25,20 +25,20 @@ pipeline {
         }
         stage("Docker Image Build") {
            steps {
-               sh "docker build -t yjy8606/apache2_AnsimSpring:${BUILD_NUMBER} ./docker/apache2/"
-               sh "docker build -t yjy8606/AnsimSpring_AnsimSpring:${BUILD_NUMBER} ./docker/AnsimSpring/"
+               sh "docker build -t yjy8606/apache2_ansimspring:${BUILD_NUMBER} ./docker/apache2/"
+               sh "docker build -t yjy8606/ansimspring_ansimspring:${BUILD_NUMBER} ./docker/AnsimSpring/"
            }
         }
         stage("Docker Image Push") {
            steps {
-               sh "docker push yjy8606/apache2_AnsimSpring:${BUILD_NUMBER}"
-               sh "docker push yjy8606/AnsimSpring_AnsimSpring:${BUILD_NUMBER}" 
+               sh "docker push yjy8606/apache2_ansimspring:${BUILD_NUMBER}"
+               sh "docker push yjy8606/ansimspring_ansimspring:${BUILD_NUMBER}" 
            } 
         }
         stage("Docker Image Clean up") {
            steps {
-               sh "docker image rm yjy8606/apache2_AnsimSpring:${BUILD_NUMBER}" 
-               sh "docker image rm yjy8606/AnsimSpring_AnsimSpring:${BUILD_NUMBER}" 
+               sh "docker image rm yjy8606/apache2_ansimspring:${BUILD_NUMBER}" 
+               sh "docker image rm yjy8606/ansimspring_ansimspring:${BUILD_NUMBER}" 
            }
         }
         stage("Minikube start") {
