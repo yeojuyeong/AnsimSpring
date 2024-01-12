@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: AnsimSpring
-        image: docker.io/yjy8606/AnsimSpring_AnsimSpring:{{VERSION}}
+        image: docker.io/yjy8606/ansimspring_ansimspring:{{VERSION}}
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -26,7 +26,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: AnsimSpring-service
+  name: ansimspring-service
 spec:
   ports:
   - port: 8080
