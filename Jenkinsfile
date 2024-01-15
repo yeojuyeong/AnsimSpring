@@ -25,19 +25,16 @@ pipeline {
         }
         stage("Docker Image Build") {
            steps {
-               sh "docker build -t yjy8606/apache2_ansimspring:${BUILD_NUMBER} ./docker/apache2/"
                sh "docker build -t yjy8606/ansimspring_ansimspring:${BUILD_NUMBER} ./docker/AnsimSpring/"
            }
         }
         stage("Docker Image Push") {
            steps {
-               sh "docker push yjy8606/apache2_ansimspring:${BUILD_NUMBER}"
                sh "docker push yjy8606/ansimspring_ansimspring:${BUILD_NUMBER}" 
            } 
         }
         stage("Docker Image Clean up") {
            steps {
-               sh "docker image rm yjy8606/apache2_ansimspring:${BUILD_NUMBER}" 
                sh "docker image rm yjy8606/ansimspring_ansimspring:${BUILD_NUMBER}" 
            }
         }
@@ -48,11 +45,9 @@ pipeline {
         }
         stage("Deploy") {
            steps {
-               sh "sed -i 's/{{VERSION}}/${BUILD_NUMBER}/g' ./kubernetes/apache2.yml"
                sh "sed -i 's/{{VERSION}}/${BUILD_NUMBER}/g' ./kubernetes/ansimspring.yml"
                sh "kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission"
                sh "kubectl apply -f ./kubernetes/ansimspring.yml"
-               sh "kubectl apply -f ./kubernetes/apache2.yml"
                sh "kubectl apply -f ./kubernetes/ingress.yml"
            } 
            post {
