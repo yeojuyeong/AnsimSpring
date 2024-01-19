@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ansimspring-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ansimspring
+  template:
+    metadata:
+      name: ansimspring
+      labels:
+        app: ansimspring
+    spec:
+      containers:
+      - name: ansimspring
+        image: docker.io/yjy8606/ansimspring_ansimspring:{{VERSION}}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: ansimspring-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ansimspring-service
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30002
+  selector:
+    app: ansimspring
+  type: NodePort
