@@ -35,7 +35,6 @@ public class BoardController {
                                        @RequestParam("user_id") String user_id) throws Exception {
 
 //        System.out.println("yourMethod started");
-
         int postNum = 6; // 한 화면에 보여지는 게시물 행의 갯수
         int startPoint = (pageNum - 1) * postNum + 1; //페이지 시작 게시물 번호
         int endPoint = pageNum * postNum;
