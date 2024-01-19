@@ -13,6 +13,7 @@ import java.util.Map;
 
 @CrossOrigin( origins = {"*"})
 @Controller
+@RequestMapping("/api")
 public class GuideController {
 
     @Autowired

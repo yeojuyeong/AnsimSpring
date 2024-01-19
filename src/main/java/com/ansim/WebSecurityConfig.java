@@ -75,16 +75,9 @@ public class WebSecurityConfig {
               .authorizeHttpRequests((authz)-> authz
                       .requestMatchers("/member/**").permitAll()
                       .requestMatchers("/guide/**").permitAll()
-                      //.requestMatchers("/guide/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/info/**").permitAll()
-                      .requestMatchers("/chat/**").permitAll()
-                      //.requestMatchers("/jwt/**").permitAll() //추가함
-                      .requestMatchers("/jwt/**").authenticated()
-                      .requestMatchers("/ws/**").permitAll()
-//                      .requestMatchers("/board/**").hasAnyAuthority("USER","MASTER")
                       .requestMatchers("/board/**").permitAll()
                       .requestMatchers("/master/**").hasAnyAuthority("MASTER")
-//                      .anyRequest().authenticated());
                       .anyRequest().permitAll());
 
 

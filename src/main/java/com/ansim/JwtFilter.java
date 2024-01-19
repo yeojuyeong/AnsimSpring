@@ -26,10 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override //허용되는 문
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         String requestURI = request.getRequestURI();
-
-        // 회원가입 API에 대한 요청은 토큰 검사를 하지 않도록 설정
         if (requestURI.equals("/member/signup")) {
             filterChain.doFilter(request, response);
             return;
@@ -52,7 +49,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String userid="";
-
         try {
             userid = (String) jwtUtil.getDataFromToken(token).get("userId");
         } catch (Exception e) {
@@ -67,6 +63,5 @@ public class JwtFilter extends OncePerRequestFilter {
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken); //권한부여
         filterChain.doFilter(request, response);
-
     }
 }

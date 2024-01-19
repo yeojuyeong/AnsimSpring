@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		//클라이언트의 로그인 요청이 들어오면 서버는 검증(ID / PW과 유효하다면) 후 클라이언트 고유 ID 등의 정보를 Payload에 담는다
 		// Access Token
 		String jwkToken = jwtUtil.generateToken(jwtPayloads, 1);
+		System.out.println("@@@##@##");
 
 		// jwkToken 쿠키 생성
 		Cookie JWTCookie = new Cookie("jwt", jwkToken);
@@ -60,12 +62,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		userIDCookie.setPath("/");  // 쿠키 사용 경로 설정
 //		userIDCookie.setHttpOnly(true);  // 자바스크립트를 통한 쿠키 접근 차단 (보안 강화)
 //		userIDCookie.setSecure(true);  // HTTPS를 통해서만 쿠키 전송 (보안 강화)
-
+		System.out.println("userIDCookie" + userIDCookie);
 		// 쿠키 추가
 		response.addCookie(JWTCookie);
 		response.addCookie(userIDCookie);
-
-		setDefaultTargetUrl("http://localhost:3000/guide");
+		System.out.println("response" + response);
+		setDefaultTargetUrl("http://www.ansim.com");
 		super.onAuthenticationSuccess(request, response, authentication);
 	}
 

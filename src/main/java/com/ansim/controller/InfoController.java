@@ -12,6 +12,7 @@ import java.util.Map;
 @CrossOrigin(origins = {"*"})
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class InfoController {
 
     private final InfoService service;

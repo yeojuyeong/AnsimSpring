@@ -25,6 +25,7 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class MemberController {
 
 	@Autowired
